@@ -1,0 +1,9 @@
+[project]
+name = "mcp-census"
+version = "0.1.0"
+description = "MCP wrapper around Census Data"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "gradio[mcp]>=5.32.0",
+]
