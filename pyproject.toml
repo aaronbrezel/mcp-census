@@ -6,4 +6,5 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "gradio[mcp]>=5.32.0",
+    "smolagents[mcp,openai]>=1.17.0",
 ]

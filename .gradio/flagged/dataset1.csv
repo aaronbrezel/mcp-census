@@ -1,0 +1,2 @@
+"Geography Hierarchy (e.g. 'state', 'county')","Geographic Name (e.g. 'California', 'Los Angeles County, California')",Optional: Parent Geographies (add rows as needed),output,timestamp
+american indian area/alaska native area/hawaiian home land (or part),test,"{""headers"": [""Parent Geography"", ""FIPS Code""], ""data"": [[""state"", ""06""]], ""metadata"": null}",,2025-06-04 11:16:29.982914
