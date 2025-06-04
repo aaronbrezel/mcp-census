@@ -1,5 +1,5 @@
+import ast
 import os
-from typing import List, Tuple
 
 import gradio as gr
 import requests
@@ -20,30 +20,45 @@ BASE_URL = "https://api.census.gov/data/2020/dec/dp"
 def fips_translation_2020(
     geography_hierarchy: str,
     name: str,
-    required_parent_geographies: List[Tuple[str, int]] | None = None,
+    required_parent_geographies: str | None = None,
 ) -> dict:
     """
     Fetches FIPS code for a given geography hierarchy and name.
 
     Args:
-        geography_hierarchy (str): The geographic level to query (e.g. 'region', 'state', 'county').
+        geography_hierarchy (str): The geographic level to query (e.g. 'region', 'state', 'county', etc.).
         name (str): The name of the geographic entity (e.g., 'California', 'Los Angeles County, California').
-        required_parent_geographies (List[Tuple[str, int]], optional): List of tuples specifying required parent geographies
-            and their FIPS codes. Each tuple should be in the format (parent_geography, fips_code).
+        required_parent_geographies (str | None): A string representing required parent geographies and their FIPS codes in the format
+            "[(geography, FIPS code), ...]". For example, "[('state', 06), ('county', 06037)]".
     Returns:
         Dict[str, str]: dictionary representing FIPS code values for provided geography_hierarchy.
     """
+    # required_parent_geographies_tuple = required_parent_geographies.itertuples(
+    #     index=False, name=None
+    # )
+
+    parent_geographies = []
+    if required_parent_geographies:
+        try:
+            # Convert string like "[(state, 06), (county, 06037)]" to list of tuples
+            parent_geographies = ast.literal_eval(required_parent_geographies)
+            if not isinstance(parent_geographies, list):
+                parent_geographies = [parent_geographies]
+        except Exception as e:
+            raise ValueError(
+                "Invalid format for required_parent_geographies. Expected a string like [(state, 06), (county, 06037)]."
+            ) from e
 
     BASE_URL = "https://api.census.gov/data/2020/dec/dp"
 
     variables = ["NAME"]
     for_clause = f"{geography_hierarchy}:*"
     params = {"get": variables, "for": for_clause, "key": API_KEY}
-    if required_parent_geographies:
+    if parent_geographies:
         in_clause = " ".join(
             [
                 f"{parent_geography}:{code}"
-                for parent_geography, code in required_parent_geographies
+                for parent_geography, code in parent_geographies
             ]
         )
         params["in"] = in_clause
@@ -57,7 +72,6 @@ def fips_translation_2020(
     except requests.RequestException as e:
         if error_text == "error: unknown/unsupported geography hierarchy":
             required_in_clauses = find_required_in_clauses(geography_hierarchy)
-            print(required_in_clauses)
             raise ValueError(
                 "Invalid geography hierarchy provided.",
                 "Acceptable required_parent_geographies must be provided.",
@@ -77,6 +91,48 @@ def fips_translation_2020(
             f"Could not find FIPS code for {name} in {geography_hierarchy}."
             f"Ensure the name is correct. Perhaps you need to include a parent geography in the name?"
         )
+
+
+def geography_hierarchy_guessing_assistant_2020(query_text: str) -> str:
+    """
+    A simple assistant that suggests a likely Census 2020 geography hierarchy based on the query text. Follows
+    a basic string matching heuristic to determine a likely geographic hierarchy that can be utilized for FIPS translation or other census-related queries.
+
+    Args:
+        query_text (str): the text in need of a geography hierarchy guess.
+    Returns:
+        str: A string representing the guessed geography hierarchy (e.g., 'school district (elementary)', 'state legislative district (lower chamber)', 'zip code tabulation area', etc.). Use this string to query the Census API for FIPS codes or other demographic data.
+    """
+
+    if query_text.isdigit() and len(query_text) == 5:
+        return "zip code tabulation area"
+    elif (
+        len(query_text) == 10
+        and query_text[:5].isdigit()
+        and query_text[5] == "-"
+        and query_text[6:].isdigit()
+    ):
+        return "zip code tabulation area"
+    elif "zcta5" in query_text.lower() or "zcta" in query_text.lower():
+        return "zip code tabulation area"
+
+    elif "high school" in query_text.lower():
+        return "school district (secondary)"
+    elif "elementary" in query_text.lower():
+        return "school district (elementary)"
+    elif (
+        "unified district" in query_text.lower()
+        or "unified school" in query_text.lower()
+    ):
+        return "school district (unified)"
+    elif "congressional district" in query_text.lower():
+        return "congressional district"
+    elif "state senate" in query_text.lower():
+        return "state legislative district (upper chamber)"
+    elif "state house" in query_text.lower():
+        return "state legislative district (lower chamber)"
+
+    return "unknown geography hierarchy"
 
 
 def demographic_profile_2020(
@@ -109,34 +165,51 @@ def demographic_profile_2020(
     return [dict(zip(headers, row)) for row in data[1:]]
 
 
-demo = gr.Interface(
-    fn=fips_translation_2020,
+demographic_profile_2020_interface = gr.Interface(
+    fn=demographic_profile_2020,
     inputs=["textbox", "textbox", "textbox"],
     outputs=gr.JSON(),
     title="Census Demographic Profile",
     description="Fetches demographic profile data from the U.S. Census Bureau API for the year 2020.",
 )
 
+fips_translation_2020_interface = gr.Interface(
+    fn=fips_translation_2020,
+    inputs=[
+        gr.Textbox(label="Geography Hierarchy (e.g. 'state', 'county')"),
+        gr.Textbox(
+            label="Geographic Name (e.g. 'California', 'Los Angeles County, California')"
+        ),
+        gr.Textbox(
+            label="Required Parent Geographies and their FIPS Codes in the format [(geography, FIPS code)]. E.g. [('state', 06), ('county', 06037)]"
+        ),
+    ],
+    outputs=gr.JSON(),
+    title="CFIPS Translation 2020",
+    description="Fetches FIPS codes from 2020 U.S. Census Bureau API.",
+)
 
-# demo = gr.Interface(
-#     fn=fips_translation_2020,
-#     inputs=[
-#         gr.Textbox(label="Geography Hierarchy (e.g. 'state', 'county')"),
-#         gr.Textbox(
-#             label="Geographic Name (e.g. 'California', 'Los Angeles County, California')"
-#         ),
-#         gr.Dataframe(
-#             headers=["Parent Geography", "FIPS Code"],
-#             datatype=["str", "number"],
-#             row_count=(0, "dynamic"),
-#             col_count=(2, "fixed"),
-#             label="Optional: Parent Geographies (add rows as needed)",
-#         ),
-#     ],
-#     outputs=gr.JSON(),
-#     title="Census Demographic Profile",
-#     description="Fetches demographic profile data from the U.S. Census Bureau API for the year 2020.",
-# )
+geography_hierarchy_guessing_assistant_2020_interface = gr.Interface(
+    fn=geography_hierarchy_guessing_assistant_2020,
+    inputs=["textbox"],
+    outputs=gr.Text(),
+    title="Census Geography Hierarchy Guessing Assistant 2020",
+    description="Based on query text, suggests a likely Census 2020 geography hierarchy for FIPS translation or other census-related queries.",
+)
+
+
+demo = gr.TabbedInterface(
+    [
+        demographic_profile_2020_interface,
+        fips_translation_2020_interface,
+        geography_hierarchy_guessing_assistant_2020_interface,
+    ],
+    [
+        "Demographic Profile 2020",
+        "FIPS Translation 2020",
+        "Geography Hierarchy Guessing Assistant 2020",
+    ],
+)
 
 
 if __name__ == "__main__":
