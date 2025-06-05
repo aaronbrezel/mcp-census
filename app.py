@@ -1,13 +1,16 @@
 import ast
 import os
-import gradio as gr
-import requests
-from dotenv import load_dotenv
-from utils import build_fips_lookup, find_required_in_clauses
+import pickle
+from collections import defaultdict
+
 import faiss
+import gradio as gr
 import numpy as np
 import openai
-import pickle
+import requests
+from dotenv import load_dotenv
+
+from utils import build_fips_lookup, find_required_in_clauses
 
 # Load Rag
 INDEX_PATH = "rag_index.faiss"
@@ -28,12 +31,14 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Base URL for the 2020 Decennial Census Data Profile (DP) endpoint
 BASE_URL = "https://api.census.gov/data/2020/dec/dp"
 
+
 def embed_text_batch(texts: list[str]) -> list[list[float]]:
     resp = openai.embeddings.create(
         model="text-embedding-ada-002",
         input=texts,
     )
     return [item.embedding for item in resp.data]
+
 
 def search_rag(query: str, top_k: int = 3) -> list[dict]:
     query_emb = embed_text_batch([query])[0]  # single embedding
@@ -42,13 +47,16 @@ def search_rag(query: str, top_k: int = 3) -> list[dict]:
     results = []
     for dist, idx in zip(distances[0], indices[0]):
         entry = metadata[idx]
-        results.append({
-            "source_id": entry["source_id"],
-            "chunk_id": entry["chunk_id"],
-            "text": entry["text"],
-            "score": float(dist)
-        })
+        results.append(
+            {
+                "source_id": entry["source_id"],
+                "chunk_id": entry["chunk_id"],
+                "text": entry["text"],
+                "score": float(dist),
+            }
+        )
     return results
+
 
 def rag_semantic_search(query: str, top_k: int = 3) -> list:
     """
@@ -70,6 +78,7 @@ def rag_semantic_search(query: str, top_k: int = 3) -> list:
 def fips_translation_2020(
     geography_hierarchy: str,
     name: str,
+    # required_parent_geographies: pd.DataFrame, # required_parent_geographies (pd.DataFrame): A Dataframe representing required parent geographies and their FIPS codes.
     required_parent_geographies: str | None = None,
 ) -> dict:
     """
@@ -78,40 +87,35 @@ def fips_translation_2020(
     Args:
         geography_hierarchy (str): The geographic level to query (e.g. 'region', 'state', 'county', etc.).
         name (str): The name of the geographic entity (e.g., 'California', 'Los Angeles County, California').
-        required_parent_geographies (str | None): A string representing required parent geographies and their FIPS codes in the format
-            "[(geography, FIPS code), ...]". For example, "[('state', 06), ('county', 06037)]".
+        required_parent_geographies (str | None): A string representing required parent geographies and their FIPS codes in the format [('<geography hierarchy>', '<FIPS code>')]
     Returns:
         Dict[str, str]: dictionary representing FIPS code values for provided geography_hierarchy.
     """
-    # required_parent_geographies_tuple = required_parent_geographies.itertuples(
-    #     index=False, name=None
-    # )
-
-    parent_geographies = []
-    if required_parent_geographies:
-        try:
-            # Convert string like "[(state, 06), (county, 06037)]" to list of tuples
-            parent_geographies = ast.literal_eval(required_parent_geographies)
-            if not isinstance(parent_geographies, list):
-                parent_geographies = [parent_geographies]
-        except Exception as e:
-            raise ValueError(
-                "Invalid format for required_parent_geographies. Expected a string like [(state, 06), (county, 06037)]."
-            ) from e
 
     BASE_URL = "https://api.census.gov/data/2020/dec/dp"
 
     variables = ["NAME"]
     for_clause = f"{geography_hierarchy}:*"
     params = {"get": variables, "for": for_clause, "key": API_KEY}
-    if parent_geographies:
-        in_clause = " ".join(
-            [
-                f"{parent_geography}:{code}"
-                for parent_geography, code in parent_geographies
-            ]
-        )
-        params["in"] = in_clause
+
+    if required_parent_geographies:
+
+        # Parse the string into a Python list
+        try:
+            pairs = ast.literal_eval(required_parent_geographies)
+        except SyntaxError as e:
+            raise SyntaxError(
+                f"{e}. required_parent_geographies must be in the format [('<geography hierarchy>', '<FIPS code>')]"
+            ) from e
+
+        # Group values by key
+        grouped = defaultdict(list)
+        for key, value in pairs:
+            grouped[key].append(value)
+        # Build the final string
+        result = " ".join(f"{key}:{','.join(grouped[key])}" for key in grouped)
+        if result != "[]":  # Another workaround for malformed function calls
+            params["in"] = result
 
     try:
         response = requests.get(BASE_URL, params=params)
@@ -139,7 +143,8 @@ def fips_translation_2020(
     except KeyError:
         raise KeyError(
             f"Could not find FIPS code for {name} in {geography_hierarchy}."
-            f"Ensure the name is correct. Perhaps you need to include a parent geography in the name?"
+            f"Ensure the name is correct. Perhaps you input the wrong name or geography_hierarchy?"
+            f"Try appending the a state to your name input like so: `name, Arizona`"
         )
 
 
@@ -231,7 +236,8 @@ fips_translation_2020_interface = gr.Interface(
             label="Geographic Name (e.g. 'California', 'Los Angeles County, California')"
         ),
         gr.Textbox(
-            label="Required Parent Geographies and their FIPS Codes in the format [(geography, FIPS code)]. E.g. [('state', 06), ('county', 06037)]"
+            label="Required Parent Geographies and their FIPS Codes in the format [('<geography hierarchy>', '<FIPS code>')]. E.g. [('state', '06'), ('county', '037')].",
+            placeholder="e.g. [('state', '06'), ('county', '037')]",
         ),
     ],
     outputs=gr.JSON(),
@@ -255,7 +261,7 @@ rag_semantic_search_interface = gr.Interface(
     ],
     outputs=gr.JSON(),
     title="Semantic Search (variables.json + technical-docs.pdf)",
-    description="Ask a question about census variable definitions or the technical documentation. Returns top-k relevant chunks using vector search."
+    description="Ask a question about census variable definitions or the technical documentation. Returns top-k relevant chunks using vector search.",
 )
 
 
@@ -270,7 +276,7 @@ demo = gr.TabbedInterface(
         "Demographic Profile 2020",
         "FIPS Translation 2020",
         "Geography Hierarchy Guessing Assistant 2020",
-        "Semantic Search (RAG)"
+        "Semantic Search (RAG)",
     ],
 )
 
