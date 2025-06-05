@@ -4,12 +4,14 @@ import gradio as gr
 from smolagents import MCPClient, OpenAIServerModel, ToolCallingAgent
 
 try:
-    mcp_client = MCPClient({"url": "http://localhost:7860/gradio_api/mcp/sse"})
+    mcp_client = MCPClient(
+        {"url": "http://localhost:7860/gradio_api/mcp/sse", "transport": "sse"}
+    )
     tools = mcp_client.get_tools()
 
     # model = InferenceClientModel(token=os.getenv("HUGGINGFACE_API_TOKEN"))
     # TODO: we need to replace with with a Modal hosted model
-    model = model = OpenAIServerModel(
+    model = OpenAIServerModel(
         model_id="gemini-2.0-flash",
         api_key=os.environ.get("GEMINI_API_KEY"),
         # Google Gemini OpenAI-compatible API base URL
@@ -18,12 +20,11 @@ try:
     agent = ToolCallingAgent(tools=[*tools], model=model, planning_interval=4)
 
     task = """
-    If you can’t find a fips code on first pass, you should ask the user for additional information like the state or metropolitan statistical area/micropolitan statistical area they are searching for.
-    If your first couple of tool calls are not successful, don't keep trying. You should stop and ask the user clarifying questions like what county they are looking for or whether they know the geographic hierarchy.
-    Don't use the geography_hierarchy_guessing_assistant_2020 tool unless it's not obvious what geography the user is asking for.
-    Before searching for school district or congressional district, make sure you know what state the user is looking for. Ask the user if you don’t know. 
+    If you are unsure about what the user is asking for, ask clarifying questions like what state they are looking.
     When searching for FIPS zip codes, take the first five digits of the zip code and prepend ZCTA5. That becomes your “zip code tabulation area” name
-    If you can’t find a fips code on first pass, you should ask the user for additional information like the state or metropolitan statistical area/micropolitan statistical area they are searching for
+    When providing your final answer to the user, clearly explain step-by-step how you arrived at your answer.
+    Include any documentation links you have access to. 
+    Suggest follow up questions as well.
     """
 
     agent.prompt_templates["system_prompt"] = (
@@ -34,11 +35,15 @@ try:
         fn=lambda message, history: str(agent.run(message)),
         type="messages",
         examples=[
+            "What can you do?",
+            "Tell me about the decennial census",
             "FIPS code for California",
+            "Over 65 population for Los Angeles County",
             "FIPS code for 11050",
+            "What locations can I look up for the decenial census",
         ],
-        title="Agent with MCP Tools",
-        description="This is a simple agent that uses MCP tools to answer questions.",
+        title="AI Agent with U.S. Census Bureau MCP Tools",
+        description="This is a simple agent that uses MCP tools to answer questions about the 2020 decennial Census.",
     )
 
     demo.launch()
