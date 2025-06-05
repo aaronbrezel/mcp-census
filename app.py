@@ -1,11 +1,21 @@
 import ast
 import os
-
 import gradio as gr
 import requests
 from dotenv import load_dotenv
-
 from utils import build_fips_lookup, find_required_in_clauses
+import faiss
+import numpy as np
+import openai
+import pickle
+
+# Load Rag
+INDEX_PATH = "rag_index.faiss"
+METADATA_PATH = "rag_metadata.pkl"
+
+index = faiss.read_index(INDEX_PATH)
+with open(METADATA_PATH, "rb") as f:
+    metadata = pickle.load(f)
 
 load_dotenv()  # Loads variables from a .env file into os.environ
 API_KEY: str | None = os.getenv("CENSUS_API_KEY", None)
@@ -13,8 +23,48 @@ if not API_KEY:
     # If no API key is found, immediately raise an error to stop execution
     raise ValueError("Set a CENSUS_API_KEY environment variable")
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 # Base URL for the 2020 Decennial Census Data Profile (DP) endpoint
 BASE_URL = "https://api.census.gov/data/2020/dec/dp"
+
+def embed_text_batch(texts: list[str]) -> list[list[float]]:
+    resp = openai.embeddings.create(
+        model="text-embedding-ada-002",
+        input=texts,
+    )
+    return [item.embedding for item in resp.data]
+
+def search_rag(query: str, top_k: int = 3) -> list[dict]:
+    query_emb = embed_text_batch([query])[0]  # single embedding
+    xq = np.array([query_emb], dtype="float32")
+    distances, indices = index.search(xq, top_k)
+    results = []
+    for dist, idx in zip(distances[0], indices[0]):
+        entry = metadata[idx]
+        results.append({
+            "source_id": entry["source_id"],
+            "chunk_id": entry["chunk_id"],
+            "text": entry["text"],
+            "score": float(dist)
+        })
+    return results
+
+def rag_semantic_search(query: str, top_k: int = 3) -> list:
+    """
+    Given a query and a top_k value, return a list of top-k matching chunks from variables.json and technical-docs.pdf.
+    Each chunk is returned as a dict with source_id, chunk_id, text, score.
+    """
+    hits = search_rag(query, top_k)
+    return [
+        {
+            "source_id": h["source_id"],
+            "chunk_id": h["chunk_id"],
+            "score": round(h["score"], 3),
+            "text": h["text"],
+        }
+        for h in hits
+    ]
 
 
 def fips_translation_2020(
@@ -197,17 +247,30 @@ geography_hierarchy_guessing_assistant_2020_interface = gr.Interface(
     description="Based on query text, suggests a likely Census 2020 geography hierarchy for FIPS translation or other census-related queries.",
 )
 
+rag_semantic_search_interface = gr.Interface(
+    fn=rag_semantic_search,
+    inputs=[
+        gr.Textbox(label="Query (natural language, e.g. 'What is DP1_0006P?')"),
+        gr.Number(label="Number of results", value=3, precision=0),
+    ],
+    outputs=gr.JSON(),
+    title="Semantic Search (variables.json + technical-docs.pdf)",
+    description="Ask a question about census variable definitions or the technical documentation. Returns top-k relevant chunks using vector search."
+)
+
 
 demo = gr.TabbedInterface(
     [
         demographic_profile_2020_interface,
         fips_translation_2020_interface,
         geography_hierarchy_guessing_assistant_2020_interface,
+        rag_semantic_search_interface,
     ],
     [
         "Demographic Profile 2020",
         "FIPS Translation 2020",
         "Geography Hierarchy Guessing Assistant 2020",
+        "Semantic Search (RAG)"
     ],
 )
 
