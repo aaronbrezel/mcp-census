@@ -30,7 +30,7 @@ def fips_translation_2020(
     Args:
         geography_hierarchy (str): The geographic level to query (e.g. 'region', 'state', 'county', etc.).
         name (str): The name of the geographic entity (e.g., 'California', 'Los Angeles County, California').
-        required_parent_geographies (str | None): A string representing required parent geographies and their FIPS codes in the format [(<geography hierarchy>, <FIPS code>)]
+        required_parent_geographies (str | None): A string representing required parent geographies and their FIPS codes in the format [('<geography hierarchy>', '<FIPS code>')]
     Returns:
         Dict[str, str]: dictionary representing FIPS code values for provided geography_hierarchy.
     """
@@ -41,16 +41,6 @@ def fips_translation_2020(
     for_clause = f"{geography_hierarchy}:*"
     params = {"get": variables, "for": for_clause, "key": API_KEY}
 
-    # if required_parent_geographies.size != 0:
-    #     in_geo = (
-    #         required_parent_geographies.groupby("Geography")["FIPS Code"]
-    #         .apply(list)
-    #         .to_dict()
-    #     )
-    #     in_clause = " ".join(
-    #         f"{geo}:{','.join(codes)}" for geo, codes in in_geo.items()
-    #     )
-    #     params["in"] = in_clause
     if required_parent_geographies:
 
         # Parse the string into a Python list
@@ -58,7 +48,7 @@ def fips_translation_2020(
             pairs = ast.literal_eval(required_parent_geographies)
         except SyntaxError as e:
             raise SyntaxError(
-                f"{e}. Did you remember to wrap your strings in quotes?"
+                f"{e}. required_parent_geographies must be in the format [('<geography hierarchy>', '<FIPS code>')]"
             ) from e
 
         # Group values by key
@@ -67,7 +57,7 @@ def fips_translation_2020(
             grouped[key].append(value)
         # Build the final string
         result = " ".join(f"{key}:{','.join(grouped[key])}" for key in grouped)
-        if result != "[]":
+        if result != "[]":  # Another workaround for malformed function calls
             params["in"] = result
 
     try:
@@ -192,13 +182,6 @@ fips_translation_2020_interface = gr.Interface(
             label="Required Parent Geographies and their FIPS Codes in the format [('<geography hierarchy>', '<FIPS code>')]. E.g. [('state', '06'), ('county', '037')].",
             placeholder="e.g. [('state', '06'), ('county', '037')]",
         ),
-        # gr.Dataframe(
-        #     headers=["Geography Hierarchy", "FIPS Code"],
-        #     datatype=["str", "str"],
-        #     row_count=(0, "dynamic"),
-        #     col_count=(2, "fixed"),
-        #     label="Required Parent Geographies and their FIPS codes",
-        # ),
     ],
     outputs=gr.JSON(),
     title="CFIPS Translation 2020",
