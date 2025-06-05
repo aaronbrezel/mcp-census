@@ -23,3 +23,7 @@ uv run python mcp_server/app.py
 ```zsh
 uv run python app.py
 ```
+
+## Agent architecture
+
+![MCP Census](mcp-census.png "MCP Census")
