@@ -1,7 +1,8 @@
+import ast
 import os
+from collections import defaultdict
 
 import gradio as gr
-import numpy as np
 import requests
 from dotenv import load_dotenv
 
@@ -20,7 +21,8 @@ BASE_URL = "https://api.census.gov/data/2020/dec/dp"
 def fips_translation_2020(
     geography_hierarchy: str,
     name: str,
-    required_parent_geographies: np.ndarray | None = None,
+    # required_parent_geographies: pd.DataFrame, # required_parent_geographies (pd.DataFrame): A Dataframe representing required parent geographies and their FIPS codes.
+    required_parent_geographies: str | None = None,
 ) -> dict:
     """
     Fetches FIPS code for a given geography hierarchy and name.
@@ -28,42 +30,45 @@ def fips_translation_2020(
     Args:
         geography_hierarchy (str): The geographic level to query (e.g. 'region', 'state', 'county', etc.).
         name (str): The name of the geographic entity (e.g., 'California', 'Los Angeles County, California').
-        required_parent_geographies (np.ndarray, optional): A numpy array of tuples representing required parent geographies and their FIPS codes.
-            Each tuple should be in the format (geography, FIPS code), e.g., [('state', 06), ('county', 06037)].
+        required_parent_geographies (str | None): A string representing required parent geographies and their FIPS codes in the format [(<geography hierarchy>, <FIPS code>)]
     Returns:
         Dict[str, str]: dictionary representing FIPS code values for provided geography_hierarchy.
     """
-    # required_parent_geographies_tuple = required_parent_geographies.itertuples(
-    #     index=False, name=None
-    # )
-    print(required_parent_geographies)
 
-    # parent_geographies = []
-    # if required_parent_geographies:
-    #     try:
-    #         # Convert string like "[(state, 06), (county, 06037)]" to list of tuples
-    #         parent_geographies = ast.literal_eval(required_parent_geographies)
-    #         if not isinstance(parent_geographies, list):
-    #             parent_geographies = [parent_geographies]
-    #     except Exception as e:
-    #         raise ValueError(
-    #             "Invalid format for required_parent_geographies. Expected a string like [(state, 06), (county, 06037)]."
-    #         ) from e
-
-    return {}
     BASE_URL = "https://api.census.gov/data/2020/dec/dp"
 
     variables = ["NAME"]
     for_clause = f"{geography_hierarchy}:*"
     params = {"get": variables, "for": for_clause, "key": API_KEY}
+
+    # if required_parent_geographies.size != 0:
+    #     in_geo = (
+    #         required_parent_geographies.groupby("Geography")["FIPS Code"]
+    #         .apply(list)
+    #         .to_dict()
+    #     )
+    #     in_clause = " ".join(
+    #         f"{geo}:{','.join(codes)}" for geo, codes in in_geo.items()
+    #     )
+    #     params["in"] = in_clause
     if required_parent_geographies:
-        in_clause = " ".join(
-            [
-                f"{parent_geography}:{code}"
-                for parent_geography, code in required_parent_geographies
-            ]
-        )
-        params["in"] = in_clause
+
+        # Parse the string into a Python list
+        try:
+            pairs = ast.literal_eval(required_parent_geographies)
+        except SyntaxError as e:
+            raise SyntaxError(
+                f"{e}. Did you remember to wrap your strings in quotes?"
+            ) from e
+
+        # Group values by key
+        grouped = defaultdict(list)
+        for key, value in pairs:
+            grouped[key].append(value)
+        # Build the final string
+        result = " ".join(f"{key}:{','.join(grouped[key])}" for key in grouped)
+        if result != "[]":
+            params["in"] = result
 
     try:
         response = requests.get(BASE_URL, params=params)
@@ -91,7 +96,8 @@ def fips_translation_2020(
     except KeyError:
         raise KeyError(
             f"Could not find FIPS code for {name} in {geography_hierarchy}."
-            f"Ensure the name is correct. Perhaps you need to include a parent geography in the name?"
+            f"Ensure the name is correct. Perhaps you input the wrong name or geography_hierarchy?"
+            f"Try appending the a state to your name input like so: `name, Arizona`"
         )
 
 
@@ -182,16 +188,17 @@ fips_translation_2020_interface = gr.Interface(
         gr.Textbox(
             label="Geographic Name (e.g. 'California', 'Los Angeles County, California')"
         ),
-        # gr.Textbox(
-        #     label="Required Parent Geographies and their FIPS Codes in the format [(geography, FIPS code)]. E.g. [('state', 06), ('county', 06037)]"
-        # ),
-        gr.Dataframe(
-            headers=["Geography", "FIPS Code"],
-            datatype=["str", "number"],
-            row_count=(1, "dynamic"),
-            col_count=(2, "fixed"),
-            label="Required Parent Geographies and their FIPS codes",
+        gr.Textbox(
+            label="Required Parent Geographies and their FIPS Codes in the format [('<geography hierarchy>', '<FIPS code>')]. E.g. [('state', '06'), ('county', '037')].",
+            placeholder="e.g. [('state', '06'), ('county', '037')]",
         ),
+        # gr.Dataframe(
+        #     headers=["Geography Hierarchy", "FIPS Code"],
+        #     datatype=["str", "str"],
+        #     row_count=(0, "dynamic"),
+        #     col_count=(2, "fixed"),
+        #     label="Required Parent Geographies and their FIPS codes",
+        # ),
     ],
     outputs=gr.JSON(),
     title="CFIPS Translation 2020",

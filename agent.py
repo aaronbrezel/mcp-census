@@ -18,6 +18,9 @@ try:
     agent = ToolCallingAgent(tools=[*tools], model=model, planning_interval=4)
 
     task = """
+    If you can’t find a fips code on first pass, you should ask the user for additional information like the state or metropolitan statistical area/micropolitan statistical area they are searching for.
+    If your first couple of tool calls are not successful, don't keep trying. You should stop and ask the user clarifying questions like what county they are looking for or whether they know the geographic hierarchy.
+    Don't use the geography_hierarchy_guessing_assistant_2020 tool unless it's not obvious what geography the user is asking for.
     Before searching for school district or congressional district, make sure you know what state the user is looking for. Ask the user if you don’t know. 
     When searching for FIPS zip codes, take the first five digits of the zip code and prepend ZCTA5. That becomes your “zip code tabulation area” name
     If you can’t find a fips code on first pass, you should ask the user for additional information like the state or metropolitan statistical area/micropolitan statistical area they are searching for
