@@ -47,6 +47,11 @@ uv run python -m phoenix.server.main serve
 
 ## Possible improvements
 
+### Evaluation
+
+* We recommend starting here to provide a strong benchmark with which to evaluate improvements.
+* MCP server tools can be evaluated via unit tests. Agentic behavior can be evaluated on criteria described [here](https://hamel.dev/blog/posts/evals/) and emerging frameworks such as [RAGAS](https://docs.ragas.io/en/stable/).
+
 ### MCP Client
 
 * Rather than build tool sets for every Census dataset (decennial, american community survey, etc.), it may be more comprensive to build tooling around the [machine readable dataset discovery tool](https://www.census.gov/data/developers/updates/new-discovery-tool.html).
@@ -54,9 +59,5 @@ uv run python -m phoenix.server.main serve
 
 ### Agent
 
-* Agentic Behavior can be fine tuned via prompting as well as introduction of additional tooling such as data exporting. The exact optimizations may depend on intended use case.
-* Improved citations of census bureau documentation.
-
-### Evaluation
-
-* Both MCP client and Agent could benefit from an evaluation protocol with which to benchmark improvements. MCP server tools can be evaluated via unit tests. Agentic behavior can be evaluated on criteria described [here](https://hamel.dev/blog/posts/evals/) and emerging frameworks such as [RAGAS](https://docs.ragas.io/en/stable/).
+* Agentic Behavior can be fine tuned via foundation model choice, prompting as well as introduction of additional tooling such as data exporting. The exact optimizations may depend on intended use case.
+* Improved citations of census bureau documentation. 
