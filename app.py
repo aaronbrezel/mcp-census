@@ -14,7 +14,7 @@ try:
 
     model = InferenceClientModel(
         provider="nebius",
-        model_id="meta-llama/Llama-3.3-70B-Instruct",
+        model_id="Qwen/Qwen2.5-32B-Instruct",
         token=os.getenv("HF_TOKEN"),
     )
 
