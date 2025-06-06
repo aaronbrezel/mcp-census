@@ -2,9 +2,14 @@ import os
 
 import gradio as gr
 from dotenv import load_dotenv
+from openinference.instrumentation.smolagents import SmolagentsInstrumentor
+from phoenix.otel import register
 from smolagents import InferenceClientModel, MCPClient, ToolCallingAgent
 
 load_dotenv()
+
+register()
+SmolagentsInstrumentor().instrument()
 
 try:
     mcp_client = MCPClient(
