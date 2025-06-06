@@ -26,4 +26,4 @@ uv run python app.py
 
 ## Agent architecture
 
-![MCP Census](mcp-census.png "MCP Census")
+<img src="mcp-census.png" alt="MCP Census" width="200" height="auto">
