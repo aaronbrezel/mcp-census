@@ -2,19 +2,6 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_huggingface import HuggingFaceEmbeddings
 
-# async def load_pages():
-#     loader = PyPDFLoader(
-#         "mcp_server/vector_databases/census_dhc_dp_techdoc/2020census-demographic-and-housing-characteristics-file-and-demographic-profile-techdoc.pdf"
-#     )
-#     pages = []
-#     async for page in loader.alazy_load():
-#         pages.append(page)
-
-#     return pages
-
-
-# pages = asyncio.run(load_pages())
-
 
 def load_pages():
     loader = PyPDFLoader(

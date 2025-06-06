@@ -83,12 +83,12 @@ demo = gr.TabbedInterface(
     ],
     [
         "2020 U.S. Census Bureau decennial census API Homepage",
-        "2020 U.S. Census Bureau decennial census demographic profile geographies",
-        "2020 U.S. Census Bureau decennial census demographic profile variables",
+        "2020 U.S. Census Bureau decennial census demographic profile API geographies",
+        "2020 U.S. Census Bureau decennial census demographic profile API variables",
         "2020 U.S. Census Bureau decennial census demographic profile geography hierarchy required parent geographies",
         "2020 U.S. Census Bureau decennial census demographic profile geography hierarchy FIPS code lookup",
-        "2020 U.S. Census Bureau decennial census demographic profile data",
-        "2020 U.S. Census Bureau decennial census demographic and housing documentation",
+        "2020 U.S. Census Bureau decennial census demographic profile API data",
+        "2020 U.S. Census Bureau decennial census demographic and housing characteristics documentation",
     ],
 )
 
