@@ -1,3 +1,15 @@
+---
+title: Census Agent
+emoji: 👀
+colorFrom: pink
+colorTo: gray
+sdk: gradio
+sdk_version: 5.33.0
+app_file: app.py
+pinned: false
+short_description: A proof of concept agent utilizing mcp census tooling
+---
+
 # mcp-census
 
 Proof of concept for an MCP Server delivering Census Bureau data for LLM interoperability.
