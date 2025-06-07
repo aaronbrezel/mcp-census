@@ -16,7 +16,7 @@ Proof of concept for an MCP Server delivering Census Bureau data for LLM interop
 
 This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon). It relies on [`smolagents`](https://github.com/huggingface/smolagents) and [`gradio`](https://github.com/gradio-app/gradio). It pulls heavily from the lovely [smolagents](https://huggingface.co/agents-course) and [mcp](https://huggingface.co/learn/mcp-course/unit0/introduction) courses published by Hugging Face.
 
-This project is a work in progress.
+This project is a work in progress. A deployed version of the mcp server is available at [https://agents-mcp-hackathon-hackathon-census-mcp-server.hf.space/](https://agents-mcp-hackathon-hackathon-census-mcp-server.hf.space/) while we work on deploying the agent. 
 
 ## Quickstart
 
