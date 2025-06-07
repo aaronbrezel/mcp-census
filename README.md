@@ -2,11 +2,15 @@
 
 Proof of concept for an MCP Server delivering Census Bureau data for LLM interoperability.
 
-This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon). It relies on [`smolagents`](https://github.com/huggingface/smolagents) and [`gradio`](https://github.com/gradio-app/gradio). It pulls heavily from the lovel [smolagents](https://huggingface.co/agents-course) and [mcp](https://huggingface.co/learn/mcp-course/unit0/introduction) courses published by Hugging Face.
+This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon). It relies on [`smolagents`](https://github.com/huggingface/smolagents) and [`gradio`](https://github.com/gradio-app/gradio). It pulls heavily from the lovely [smolagents](https://huggingface.co/agents-course) and [mcp](https://huggingface.co/learn/mcp-course/unit0/introduction) courses published by Hugging Face.
+
+This project is a work in progress.
 
 ## Quickstart
 
 We suggest using [`uv`](https://docs.astral.sh/uv/) to manage dependencies, but you can install the required packages directly from the [`pyproject.toml` file](pyproject.toml)
+
+You need to start all three applications (MCP server, Agent, Phoenix) for the system to work at the moment.
 
 ##  API Key
 
@@ -14,7 +18,7 @@ We suggest using [`uv`](https://docs.astral.sh/uv/) to manage dependencies, but 
 cp .env.example .env
 ```
 
-Then fill out your API key
+Then fill out your API keys
 
 To request a census API key, visit https://api.census.gov/data/key_signup.html
 To request a Hugging Face token, visit https://huggingface.co/docs/hub/security-tokens

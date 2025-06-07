@@ -86,6 +86,8 @@ def decennial_2020_demographic_profile_fips_lookup(
         data = response.json()
     except requests.RequestException as e:
         if error_text == "error: unknown/unsupported geography hierarchy":
+            # TODO: This error gets raise both if a parent geography is missing AND if the requested
+            # geography is invalid. We need to impove this raised error to help parse the difference.
             raise ValueError(
                 "Invalid geography hierarchy provided.",
                 "Acceptable required_parent_geographies must be provided.",

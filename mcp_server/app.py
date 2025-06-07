@@ -71,7 +71,7 @@ decennial_2020_datasets_homepage_interface = gr.Interface(
 )
 
 
-demo = gr.TabbedInterface(
+mcp_server_demo = gr.TabbedInterface(
     [
         decennial_2020_datasets_homepage_interface,
         decennial_2020_demographic_profile_geographies_interface,
@@ -94,4 +94,4 @@ demo = gr.TabbedInterface(
 
 
 if __name__ == "__main__":
-    demo.launch(mcp_server=True)
+    mcp_server_demo.launch(mcp_server=True)
