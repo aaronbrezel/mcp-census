@@ -8,6 +8,7 @@ on:               # or directly `on: [push]` to run the action on every push on 
 
 permissions:     
   contents: read   # Grants read access to repository contents
+  pull-requests: write  # Add this to ensure the workflow can access pull request resources
 
 jobs:
   sync-to-hub:
