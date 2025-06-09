@@ -1,0 +1,16 @@
+[project]
+name = "mcp-census"
+version = "0.1.0"
+description = "MCP wrapper around Census Data"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "gradio[mcp]>=5.32.0",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.24",
+    "langchain-huggingface>=0.2.0",
+    "markdownify>=1.1.0",
+    "pypdf>=5.6.0",
+    "sentence-transformers>=4.1.0",
+    "smolagents[mcp,openai,telemetry]>=1.17.0",
+]
