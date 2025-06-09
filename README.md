@@ -16,9 +16,19 @@ tags:
 
 A work-in-progress MCP server leveraging U.S. Census Bureau tooling for LLM interoperability.
 
-A deployed interactive version of the mcp server is available at [https://abrezey-mcp-census.hf.space/](https://abrezey-mcp-census.hf.space/). A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse). Pushes to the `main` branch of this repo will trigger a redeployment of these resources. 
+A deployed interactive version of the mcp server is available at [https://abrezey-mcp-census.hf.space/](https://abrezey-mcp-census.hf.space/). A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse). Pushes to the `main` branch of this repo will trigger a redeployment of these resources via GitHub Actions.
 
 This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon).
+
+## Example usage
+
+Right now, we recommend using `mcp-census` in conjunction with a MCP Client like Claude Desktop or Cursor. If you prefer to run your own client application, check out [Local Agent Quickstart](#local-agent-quickstart).
+
+**What is the population of Hennepin County, MN for those who are 65 and older?**
+
+**What is the racial/ethnic breakdown of Yolo County?**
+
+**Lookup data from the US 2020 Decennial Census and provide a CSV containing data about the number of housing units, total population, and median age for all counties in New York State. For the column containing the county identifier, please provide a complete FIPS containing the state and county as a joined value.**
 
 ## Local MCP server quickstart
 
