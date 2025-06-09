@@ -16,15 +16,15 @@ MCP server leveraging U.S. Census Bureau tooling for LLM interoperability.
 
 This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon). 
 
-This project is a work in progress. A deployed version of the mcp server is available at [https://agents-mcp-hackathon-hackathon-census-mcp-server.hf.space/](https://agents-mcp-hackathon-hackathon-census-mcp-server.hf.space/).
+This project is a work in progress. A deployed interactive version of the mcp server is available at [https://abrezey-mcp-census.hf.space/](https://abrezey-mcp-census.hf.space/). A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse).
 
-## Quickstart
+## Local MCP server quickstart
 
 We suggest using [`uv`](https://docs.astral.sh/uv/) to manage dependencies, but you can install the required packages directly from the [`pyproject.toml` file](pyproject.toml)
 
 You need to start all three applications (MCP server, Agent, Phoenix) for the system to work at the moment.
 
-##  API Key
+## API Key
 
 ```zsh
 cp .env.example .env
@@ -35,6 +35,8 @@ Then fill out your API keys
 To request a census API key, visit https://api.census.gov/data/key_signup.html
 To request a Hugging Face token, visit https://huggingface.co/docs/hub/security-tokens
 
+The MCP server does not require a Hugging Face token, though it becomes useful during agent development.
+
 ### MCP server
 
 ```zsh
@@ -42,6 +44,8 @@ uv run python app.py
 ```
 
 Assuming you have no other gradio applications running, this will serve your MCP server at http://localhost:7860/gradio_api/mcp/sse
+
+## Local Agent Quickstart
 
 ### Agent (and MCP client)
 
@@ -78,5 +82,4 @@ The agent will not work without this server running.
 ### Agent
 
 * Agentic Behavior can be fine tuned via foundation model choice, prompting as well as introduction of additional tooling such as data exporting. The exact optimizations may depend on intended use case.
-* Improved citations of census bureau documentation. 
-
+* Improved citations of census bureau documentation.

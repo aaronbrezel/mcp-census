@@ -17,7 +17,7 @@ mcp_client = MCPClient(
     # {"url": "http://localhost:7860/gradio_api/mcp/sse", "transport": "sse"},
     # To connect to a remote mcp server
     {
-        "url": "https://agents-mcp-hackathon-hackathon-census-mcp-server.hf.space/gradio_api/mcp/sse",
+        "url": "https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse",
         "transport": "sse",
     },
 )
