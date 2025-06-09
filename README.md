@@ -26,9 +26,21 @@ Right now, we recommend using `mcp-census` in conjunction with a MCP Client like
 
 **What is the population of Hennepin County, MN for those who are 65 and older?**
 
+
+https://github.com/user-attachments/assets/c979b9aa-8299-4eec-ad32-362d28ced5e4
+
+
 **What is the racial/ethnic breakdown of Yolo County?**
 
+
+https://github.com/user-attachments/assets/d7c34ecb-4503-4bde-a7eb-b865a6f076c8
+
+
 **Lookup data from the US 2020 Decennial Census and provide a CSV containing data about the number of housing units, total population, and median age for all counties in New York State. For the column containing the county identifier, please provide a complete FIPS containing the state and county as a joined value.**
+
+
+https://github.com/user-attachments/assets/cffd80f0-0830-4534-ab1a-9574608967ad
+
 
 ## Local MCP server quickstart
 
