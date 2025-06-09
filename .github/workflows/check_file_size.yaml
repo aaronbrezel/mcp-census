@@ -6,7 +6,7 @@ on:               # or directly `on: [push]` to run the action on every push on 
   # to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-permissions:       # Add this block to grant permissions
+permissions:     
   contents: read   # Grants read access to repository contents
 
 jobs:
@@ -14,6 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check large files
-        uses: ActionsDesk/lfs-warning@v2.0
+        uses: ActionsDesk/lfs-warning@v3.2
         with:
           filesizelimit: 10485760 # this is 10MB so we can sync to HF Spaces
