@@ -1,5 +1,5 @@
 ---
-title: Mcp Census
+title: 🏘️ Mcp Census
 emoji: 🏘️
 colorFrom: yellow
 colorTo: indigo
@@ -8,15 +8,17 @@ sdk_version: 5.33.0
 app_file: app.py
 pinned: false
 short_description: MCP server leveraging U.S. Census Bureau tooling
+tags:
+    - mcp-server-track
 ---
 
 # mcp-census
 
-MCP server leveraging U.S. Census Bureau tooling for LLM interoperability.
+A work-in-progress MCP server leveraging U.S. Census Bureau tooling for LLM interoperability.
 
-This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon). 
+A deployed interactive version of the mcp server is available at [https://abrezey-mcp-census.hf.space/](https://abrezey-mcp-census.hf.space/). A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse). Pushes to the `main` branch of this repo will trigger a redeployment of these resources. 
 
-This project is a work in progress. A deployed interactive version of the mcp server is available at [https://abrezey-mcp-census.hf.space/](https://abrezey-mcp-census.hf.space/). A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse).
+This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon).
 
 ## Local MCP server quickstart
 
