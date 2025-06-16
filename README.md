@@ -59,7 +59,12 @@ The MCP server does not require a Hugging Face token, though it becomes useful d
 uv run --group gradio-deployment python gradio_app.py
 ```
 
-Assuming you have no other gradio applications running, this will serve your MCP server at http://localhost:7860/gradio_api/mcp/sse
+Assuming you have no other Gradio applications running, this will serve your MCP server at http://localhost:7860/gradio_api/mcp/sse
+
+To update dependencies for the Gradio deployment
+```
+uv export --group gradio-deployment > requirements.txt
+```
 
 ## Local Agent Quickstart
 
