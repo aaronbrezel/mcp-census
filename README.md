@@ -5,6 +5,7 @@ colorFrom: yellow
 colorTo: indigo
 sdk: gradio
 sdk_version: 5.33.0
+python_version: 3.13
 app_file: gradio_app.py
 pinned: false
 short_description: MCP server leveraging U.S. Census Bureau tooling
