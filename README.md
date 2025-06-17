@@ -63,8 +63,23 @@ uv run --group gradio-deployment python gradio_app.py
 Assuming you have no other Gradio applications running, this will serve your MCP server at http://localhost:7860/gradio_api/mcp/sse
 
 To update dependencies for the Gradio deployment
-```
+
+```zsh
 uv export --group gradio-deployment > requirements.txt
+```
+
+### Fast MCP server
+
+In dev mode
+
+```zsh
+uv run mcp dev server.py
+```
+
+To install in your local Claude Desktop app
+
+```zsh
+uv run mcp install server.py --with-editable .
 ```
 
 ## Local Agent Quickstart
@@ -72,7 +87,7 @@ uv export --group gradio-deployment > requirements.txt
 ### Agent (and MCP client)
 
 ```zsh
-uv run python agent.py
+uv run --group agent python agent.py
 ```
 
 ### Observability

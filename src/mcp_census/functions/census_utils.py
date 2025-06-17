@@ -2,8 +2,10 @@ from typing import List
 
 from langchain_core.documents import Document
 
-from functions.utils import find_required_parent_geographies
-from functions.vector_databases.census_dhc_dp_techdoc import census_dhc_dp_techdoc
+from .utils import find_required_parent_geographies
+from .vector_databases.census_dhc_dp_techdoc import (
+    census_dhc_dp_techdoc,
+)
 
 
 def required_geograpy_hierarchy_parents(geography_hierarchy: str) -> List[str | None]:

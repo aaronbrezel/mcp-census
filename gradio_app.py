@@ -1,15 +1,15 @@
 import gradio as gr
 
-from functions.census_api_calls import (
+from src.mcp_census.functions.census_api_calls import (
     dec2020_dp,
     dec2020_dp_fips_lookup,
 )
-from functions.census_api_docs import (
+from src.mcp_census.functions.census_api_docs import (
     import_dec2020_datasets_homepage,
     import_dec2020_dp_geographies,
     import_dec2020_dp_variables,
 )
-from functions.census_utils import (
+from src.mcp_census.functions.census_utils import (
     dec2020_dhc_semantic_search,
     required_geograpy_hierarchy_parents,
 )
