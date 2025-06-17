@@ -6,7 +6,10 @@ from typing import List, Tuple
 import requests
 from dotenv import load_dotenv
 
-from functions.utils import build_fips_lookup, find_required_parent_geographies
+from .utils import (
+    build_fips_lookup,
+    find_required_parent_geographies,
+)
 
 
 def parse_required_parent_geographies_string(data_str: str) -> List[Tuple[str, str]]:

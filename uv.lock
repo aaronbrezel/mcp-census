@@ -1072,6 +1072,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/79/45/823ad05504bea55cb0feb7470387f151252127ad5c72f8882e8fe6cf5c0e/mcp-1.9.3-py3-none-any.whl", hash = "sha256:69b0136d1ac9927402ed4cf221d4b8ff875e7132b0b06edd446448766f34f9b9", size = 131063, upload-time = "2025-06-05T15:48:24.171Z" },
 ]
 
+[package.optional-dependencies]
+cli = [
+    { name = "python-dotenv" },
+    { name = "typer" },
+]
+
 [[package]]
 name = "mcp-census"
 version = "0.1.0"
@@ -1081,6 +1087,7 @@ dependencies = [
     { name = "langchain-community" },
     { name = "langchain-huggingface" },
     { name = "markdownify" },
+    { name = "mcp", extra = ["cli"] },
     { name = "pypdf" },
     { name = "sentence-transformers" },
 ]
@@ -1099,6 +1106,7 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.3.24" },
     { name = "langchain-huggingface", specifier = ">=0.2.0" },
     { name = "markdownify", specifier = ">=1.1.0" },
+    { name = "mcp", extras = ["cli"], specifier = ">=1.9.3" },
     { name = "pypdf", specifier = ">=5.6.0" },
     { name = "sentence-transformers", specifier = ">=4.1.0" },
 ]
