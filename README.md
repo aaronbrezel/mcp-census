@@ -98,25 +98,25 @@ When debugging Agents, observability is key. The agent is currently configured t
 uv run python -m phoenix.server.main serve
 ```
 
-The agent will not work without this server running. 
+The agent will not work without this server running.
 
 ## MCP architecture
 
 <img src="assets/mcp-census.png" alt="MCP Census" width="200" height="auto">
 
-## Possible improvements
+## Roadmap
 
 ### Evaluation
 
-* We recommend starting here to provide a strong benchmark with which to evaluate improvements.
-* MCP server tools can be evaluated via unit tests. Agentic behavior can be evaluated on criteria described [here](https://hamel.dev/blog/posts/evals/) and emerging frameworks such as [RAGAS](https://docs.ragas.io/en/stable/).
+1. Implement unit tests on MCP Tools, Resources, Prompts etc. 
+2. Implement Agentic Evaluation (Appropriate responses and tool/resource/etc calling). Agentic behavior can be evaluated on criteria described [here](https://hamel.dev/blog/posts/evals/) and emerging frameworks such as [RAGAS](https://docs.ragas.io/en/stable/).
 
 ### MCP Client
 
-* Rather than build tool sets for every Census dataset (decennial, american community survey, etc.), it may be more comprensive to build tooling around the [machine readable dataset discovery tool](https://www.census.gov/data/developers/updates/new-discovery-tool.html).
-* The Census Bureau publishes myriad documentation. Enabling semantic retrieval via RAG should provide agents with information to better respond to user queries.
+1. Rather than build tool sets for every Census dataset (decennial, american community survey, etc.), it may be more comprensive to build tooling around the [machine readable dataset discovery tool](https://www.census.gov/data/developers/updates/new-discovery-tool.html).
+2. The Census Bureau publishes myriad documentation. Enabling semantic retrieval via RAG should provide agents with information to better respond to user queries.
 
 ### Agent
 
-* Agentic Behavior can be fine tuned via foundation model choice, prompting as well as introduction of additional tooling such as data exporting. The exact optimizations may depend on intended use case.
-* Improved citations of census bureau documentation.
+1. Agentic Behavior can be fine tuned via foundation model choice, prompting as well as introduction of additional tooling such as data exporting. The exact optimizations may depend on intended use case.
+2. Improved citations of census bureau documentation.
