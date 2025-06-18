@@ -59,6 +59,3 @@ mcp.add_tool(
         title="DEC2020 DP Dataset geographic hierarchies", readOnlyHint=True
     ),
 )
-
-if __name__ == "__main__":
-    mcp.run()
