@@ -23,11 +23,12 @@ mcp_client = MCPClient(
 )
 mcp_tools = mcp_client.get_tools()
 
+
 task = """
     If you are unsure about what the user is asking for, ask clarifying questions like what state they are looking.
     When searching for FIPS zip codes, take the first five digits of the zip code and prepend ZCTA5. That becomes your “zip code tabulation area” name
     When providing your final answer to the user, clearly explain step-by-step how you arrived at your answer as a bulleted list.
-    Include any documentation links you have access to. 
+    Include any documentation links you have access to.
     Suggest follow up questions as well.
     """
 
@@ -48,7 +49,6 @@ def agent_chat(message, history, hf_token_state, hf_inference_model_id_state):
 
 
 def agent_tab():
-
     with gr.Blocks():
         gr.Markdown("## Census Agent: Ask Questions about the 2020 Decennial Census")
         gr.Markdown(
@@ -56,7 +56,6 @@ def agent_tab():
         )
         with gr.Row():
             with gr.Column(scale=1):
-
                 hf_token_input = gr.Textbox(
                     label="🔑 Hugging Face API Token",
                     placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxx",
@@ -121,7 +120,6 @@ def agent_tab():
                 )
 
             with gr.Column(scale=2):
-
                 gr.ChatInterface(
                     fn=agent_chat,
                     additional_inputs=[hf_token_state, hf_model_state],
@@ -140,7 +138,6 @@ def agent_tab():
 
 
 with gr.Blocks(title="Census MCP Server Demo") as demo:
-
     with gr.Tab("🏘️ Decennial census agent"):
         agent_tab()
 

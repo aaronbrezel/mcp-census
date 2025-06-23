@@ -39,7 +39,10 @@ https://github.com/user-attachments/assets/cffd80f0-0830-4534-ab1a-9574608967ad
 
 We suggest using [`uv`](https://docs.astral.sh/uv/) to manage dependencies, but you can install the required packages directly from the [`pyproject.toml` file](pyproject.toml)
 
-You need to start all three applications (MCP server, Agent, Phoenix) for the system to work at the moment.
+Linting and formatting provided by [`ruff`](https://docs.astral.sh/ruff/) and [`pre-commit`](https://pre-commit.com/)
+```zsh
+uv run pre-commit install
+```
 
 ## API Key
 
@@ -82,7 +85,11 @@ To install in your local Claude Desktop app
 uv run mcp install server.py --with-editable .
 ```
 
+`--with-editable .` ensures that the server gets installed with the dependencies defined in `pyproject.toml`. Subject to change as [work continues](https://github.com/aaronbrezel/mcp-census/pull/8) on the package structure of `mcp-census`.
+
 ## Local Agent Quickstart
+
+You need to start all three applications (MCP server, Agent, Phoenix) for the system to work at the moment.
 
 ### Agent (and MCP client)
 
@@ -98,7 +105,7 @@ When debugging Agents, observability is key. The agent is currently configured t
 uv run python -m phoenix.server.main serve
 ```
 
-The agent will not work without this server running. 
+The agent will not work without this server running.
 
 ## MCP architecture
 

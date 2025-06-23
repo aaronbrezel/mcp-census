@@ -21,6 +21,10 @@ mcp-census = "mcp_census:server"
 agent = [
     "smolagents[mcp,openai,telemetry]>=1.17.0",
 ]
+dev = [
+    "pre-commit>=4.2.0",
+    "ruff>=0.11.13",
+]
 gradio-deployment = [
     "gradio[mcp]>=5.33.0",
 ]
