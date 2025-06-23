@@ -6,7 +6,6 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 
 def load_pages():
-
     pdf_path = (
         Path(__file__).resolve().parent.parent.parent.parent.parent.parent
         / "src"
