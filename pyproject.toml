@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mcp-census = "mcp_census:server"
+mcp-census = "mcp_census:main"
 
 [dependency-groups]
 agent = [
