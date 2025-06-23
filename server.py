@@ -18,9 +18,36 @@ from src.mcp_census.functions.census_utils import (
 mcp = FastMCP("MCP Census")
 
 # Define MCP Tools, Resources, Prompts and Samplings
-# TODO: For now, we're going to define all of our census python functions
-# as MCP tools. However, we'll likely want to transition most of the documentation-based
-# Tools into resources.
+
+################
+# Census API dataset documentation as MCP Resources. Think of resources as "plugins" to the
+# LLM context window that give it a starting knowledge base.
+# Resource uri guide: https://modelcontextprotocol.io/docs/concepts/resources#resource-uris
+# TODO: Unfortunately, this configuration runs afoul of Claude Desktop's context size limit
+#       We'll need to find a way to help the LLM understand what datasets are available without
+#       blowing up the context size. Tooling may be the way to go
+################
+# @mcp.resource("census://data")
+# async def fetch_census_datasets() -> str:
+#     """
+#     Fetch the list of available datasets from the Census Data API
+#     """
+#     url = "https://api.census.gov/data.html"
+
+#     async with httpx.AsyncClient() as client:
+#         resp = await client.get(url)
+#         resp.raise_for_status()
+#         return markdownify(resp.text.strip())
+# @mcp.resource("census://data/{year}/{endpoint}")
+# async def fetch_census_dataset(year: str, endpoint: str) -> str:
+#     """Fetch raw metadata or documentation from the Census Data API."""
+#     url = f"https://api.census.gov/data/{year}/{endpoint}.html"
+#     async with httpx.AsyncClient() as client:
+#         resp = await client.get(url)
+#         resp.raise_for_status()
+#         return markdownify(resp.text.strip())
+
+
 mcp.add_tool(
     fn=import_dec2020_datasets_homepage,
     annotations=ToolAnnotations(title="DEC2020 Datasets homepage", readOnlyHint=True),
