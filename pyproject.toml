@@ -5,6 +5,7 @@ description = "MCP wrapper around Census Data"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "faiss-cpu>=1.11.0",
     "langchain>=0.3.25",
     "langchain-community>=0.3.24",
     "langchain-huggingface>=0.2.0",

@@ -1,18 +1,15 @@
 from mcp.server.fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 
-from src.mcp_census.functions.census_api_calls import (
-    dec2020_dp,
-    dec2020_dp_fips_lookup,
-)
-from src.mcp_census.functions.census_api_docs import (
-    import_dec2020_datasets_homepage,
-    import_dec2020_dp_geographies,
-    import_dec2020_dp_variables,
-)
-from src.mcp_census.functions.census_utils import (
-    dec2020_dhc_semantic_search,
-    required_geograpy_hierarchy_parents,
+from src.mcp_census.functions.census_api import (
+    fetch_dataset_data,
+    fetch_dataset_examples,
+    fetch_dataset_fips,
+    fetch_dataset_geographies,
+    fetch_dataset_required_parent_geographies,
+    fetch_dataset_variables,
+    fetch_datasets,
+    lookup_dataset_fips,
 )
 
 mcp = FastMCP("MCP Census")
@@ -49,41 +46,62 @@ mcp = FastMCP("MCP Census")
 
 
 mcp.add_tool(
-    fn=import_dec2020_datasets_homepage,
-    annotations=ToolAnnotations(title="DEC2020 Datasets homepage", readOnlyHint=True),
-)
-mcp.add_tool(
-    fn=import_dec2020_dp_geographies,
+    fn=fetch_datasets,
     annotations=ToolAnnotations(
-        title="DEC2020 DP Dataset geographies", readOnlyHint=True
-    ),
-)
-mcp.add_tool(
-    fn=import_dec2020_dp_variables,
-    annotations=ToolAnnotations(
-        title="DEC2020 DP Dataset variables", readOnlyHint=True
+        title="Fetch Census Datasets by Year",
+        readOnlyHint=True,
     ),
 )
 
 mcp.add_tool(
-    fn=dec2020_dp,
-    annotations=ToolAnnotations(title="DEC2020 DP Dataset request", readOnlyHint=True),
+    fn=fetch_dataset_geographies,
+    annotations=ToolAnnotations(
+        title="Fetch Census Dataset Geographies",
+        readOnlyHint=True,
+    ),
 )
 mcp.add_tool(
-    fn=dec2020_dp_fips_lookup,
+    fn=fetch_dataset_variables,
     annotations=ToolAnnotations(
-        title="DEC2020 DP Dataset fips lookup", readOnlyHint=True
+        title="Fetch Census Dataset Variables",
+        readOnlyHint=True,
+    ),
+)
+mcp.add_tool(
+    fn=fetch_dataset_examples,
+    annotations=ToolAnnotations(
+        title="Fetch Census Dataset Example API Calls",
+        readOnlyHint=True,
+    ),
+)
+mcp.add_tool(
+    fn=fetch_dataset_required_parent_geographies,
+    annotations=ToolAnnotations(
+        title="Fetch Census Dataset Required Geographies",
+        readOnlyHint=True,
+    ),
+)
+mcp.add_tool(
+    fn=fetch_dataset_fips,
+    annotations=ToolAnnotations(
+        title="Fetch Census Dataset Geography FIPS Codes",
+        readOnlyHint=True,
     ),
 )
 
 mcp.add_tool(
-    fn=dec2020_dhc_semantic_search,
-    annotations=ToolAnnotations(title="DEC2020 DHC Documentation", readOnlyHint=True),
-)
-mcp.add_tool(
-    fn=required_geograpy_hierarchy_parents,
+    fn=lookup_dataset_fips,
     annotations=ToolAnnotations(
-        title="DEC2020 DP Dataset geographic hierarchies", readOnlyHint=True
+        title="Census Dataset FIPS Codes lookup by name",
+        readOnlyHint=True,
+    ),
+)
+
+mcp.add_tool(
+    fn=fetch_dataset_data,
+    annotations=ToolAnnotations(
+        title="Fetch Census Dataset Data",
+        readOnlyHint=True,
     ),
 )
 
