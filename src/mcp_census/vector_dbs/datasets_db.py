@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import List, Optional
 
 import httpx
@@ -6,8 +7,13 @@ from langchain.docstore.document import Document
 from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_huggingface import HuggingFaceEmbeddings
+from mcp.server.fastmcp.utilities.logging import get_logger
 
-PERSIST_DIR = os.path.abspath("census_datasets_faiss_index")
+LOG = get_logger(__name__)
+
+PERSIST_DIR = (
+    Path(__file__).resolve().parent.parent.parent.parent / "census_datasets_faiss_index"
+)
 
 
 def fetch_census_dataset_documents() -> List[Document]:
@@ -20,7 +26,7 @@ def fetch_census_dataset_documents() -> List[Document]:
                         formatted dataset content and associated metadata.
     """
     # Fetch the list of available Census Datasets ~1,700 in totl
-    # print("Fetching Census datasets...")
+    LOG.info("Fetching Census datasets...")
     url = "https://api.census.gov/data.json"
     response = httpx.get(url)
     response.raise_for_status()
@@ -64,14 +70,14 @@ def create_vectordb(documents: List[Document]) -> FAISS:
         FAISS: A FAISS vector store initialized with embedded document vectors.
     """
     # Create a vector store using pre-trained embedding model
-    # print("Embedding Census Dataset database... This could take a few minutes")
+    LOG.info("Embedding Census Dataset database... This could take a few minutes")
     model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     vectordb = FAISS.from_documents(
         documents=documents,
         embedding=model,
         distance_strategy=DistanceStrategy.COSINE,
     )
-    # print("Done! Vector database created with", len(documents), "datasets.")
+    LOG.info("Done! Vector database created with", len(documents), "datasets.")
 
     return vectordb
 
@@ -97,7 +103,7 @@ def load_or_create_vectordb() -> FAISS:
         FAISS: A loaded or newly created FAISS vector store instance.
     """
     if os.path.exists(PERSIST_DIR):
-        # print(f"Loading existing vector DB from '{PERSIST_DIR}'")
+        LOG.info(f"Loading existing vector DB from '{PERSIST_DIR}'")
         embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         vectordb = FAISS.load_local(
             folder_path=PERSIST_DIR,
@@ -105,11 +111,11 @@ def load_or_create_vectordb() -> FAISS:
             allow_dangerous_deserialization=True,
         )
     else:
-        # print("No saved vector DB found. Creating one now...")
+        LOG.info("No saved vector DB found. Creating one now...")
         documents = fetch_census_dataset_documents()
         vectordb = create_vectordb(documents)
         save_vectordb(vectordb)
-        # print("Saved vector DB.")
+        LOG.info("Saved vector DB.")
     return vectordb
 
 
@@ -153,9 +159,9 @@ def search_census_datasets(
 
 # Rebuild on script run
 if __name__ == "__main__":
-    # print("Rebuilding and saving the Census vector DB...")
+    LOG.info("Rebuilding and saving the Census vector DB...")
     documents = fetch_census_dataset_documents()
-    # print(len(documents), "datasets fetched from Census API")
+    LOG.info(len(documents), "datasets fetched from Census API")
     vectordb = create_vectordb(documents)
     save_vectordb(vectordb)
-    # print("Done rebuilding. Vector DB saved to", PERSIST_DIR)
+    LOG.info("Done rebuilding. Vector DB saved to", PERSIST_DIR)
