@@ -71,8 +71,7 @@ cp .env.example .env
 
 Then fill out your API keys
 
-To request a census API key, visit https://api.census.gov/data/key_signup.html
-To request a Hugging Face token, visit https://huggingface.co/docs/hub/security-tokens
+To request a census API key, visit https://api.census.gov/data/key_signup.html. To request a Hugging Face token, visit https://huggingface.co/docs/hub/security-tokens.
 
 The MCP server does not require a Hugging Face token, though it becomes useful during agent development.
 
