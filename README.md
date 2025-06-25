@@ -15,13 +15,25 @@ short_description: MCP server leveraging U.S. Census Bureau tooling
 
 A work-in-progress MCP server leveraging U.S. Census Bureau tooling for LLM interoperability.
 
-A deployed interactive version of the mcp server is available at [https://abrezey-mcp-census.hf.space/](https://abrezey-mcp-census.hf.space/). A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse). Pushes to the `main` branch of this repo will trigger a redeployment of these resources via GitHub Actions.
+A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse). Pushes to the `main` branch of this repo will trigger a redeployment of this resource via GitHub Actions.
 
-This repo was built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon).
+This repo was originally built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon).
+
+## Quickstart
+
+Right now, we recommend using `mcp-census` in conjunction with an MCP Client running a strong foundation model like Claude Desktop or Cursor.
+
+To connect Claude Desktop to the `mcp-census` server hosted on Hugging Face (_requires Claude Pro tier and above_):
+[TK]
+
+To locally run `mcp-census` directly in Claude Desktop:
+```zsh
+uv run mcp install server.py --with-editable .
+```
+
+If you prefer to run your own client application and LLM, check out [Local Agent Quickstart](#local-agent-quickstart).
 
 ## Example usage
-
-Right now, we recommend using `mcp-census` in conjunction with a MCP Client like Claude Desktop or Cursor. If you prefer to run your own client application, check out [Local Agent Quickstart](#local-agent-quickstart).
 
 **What is the population of Hennepin County, MN for those who are 65 and older?**
 
@@ -35,7 +47,7 @@ https://github.com/user-attachments/assets/d7c34ecb-4503-4bde-a7eb-b865a6f076c8
 
 https://github.com/user-attachments/assets/cffd80f0-0830-4534-ab1a-9574608967ad
 
-## Local MCP server quickstart
+## Local MCP server local development
 
 We suggest using [`uv`](https://docs.astral.sh/uv/) to manage dependencies, but you can install the required packages directly from the [`pyproject.toml` file](pyproject.toml)
 
@@ -44,7 +56,14 @@ Linting and formatting provided by [`ruff`](https://docs.astral.sh/ruff/) and [`
 uv run pre-commit install
 ```
 
-## API Key
+The `mcp` package provides a handy dev server where you can test functions via UI.
+```zsh
+uv run mcp dev server.py
+```
+
+## API Keys
+
+`mcp-census` requires an API key in order to request data from U.S. Census Bureau servers.
 
 ```zsh
 cp .env.example .env
@@ -57,7 +76,7 @@ To request a Hugging Face token, visit https://huggingface.co/docs/hub/security-
 
 The MCP server does not require a Hugging Face token, though it becomes useful during agent development.
 
-### Gradio MCP server
+## Gradio MCP server local development
 
 ```zsh
 uv run --group gradio-deployment python gradio_app.py
@@ -70,22 +89,6 @@ To update dependencies for the Gradio deployment
 ```zsh
 uv export --group gradio-deployment > requirements.txt
 ```
-
-### Fast MCP server
-
-In dev mode
-
-```zsh
-uv run mcp dev server.py
-```
-
-To install in your local Claude Desktop app
-
-```zsh
-uv run mcp install server.py --with-editable .
-```
-
-`--with-editable .` ensures that the server gets installed with the dependencies defined in `pyproject.toml`. Subject to change as [work continues](https://github.com/aaronbrezel/mcp-census/pull/8) on the package structure of `mcp-census`.
 
 ## Local Agent Quickstart
 
@@ -115,12 +118,11 @@ The agent will not work without this server running.
 
 ### Evaluation
 
-* We recommend starting here to provide a strong benchmark with which to evaluate improvements.
-* MCP server tools can be evaluated via unit tests. Agentic behavior can be evaluated on criteria described [here](https://hamel.dev/blog/posts/evals/) and emerging frameworks such as [RAGAS](https://docs.ragas.io/en/stable/).
+* In order to systematically improve MCP server and client performance we recommend creating a strong benchmark with which to evaluate changes.
+* MCP server tools can be evaluated via unit tests. Client and agentic behavior can be evaluated on criteria described [here](https://hamel.dev/blog/posts/evals/) and emerging frameworks such as [RAGAS](https://docs.ragas.io/en/stable/).
 
-### MCP Client
+### MCP Server
 
-* Rather than build tool sets for every Census dataset (decennial, american community survey, etc.), it may be more comprensive to build tooling around the [machine readable dataset discovery tool](https://www.census.gov/data/developers/updates/new-discovery-tool.html).
 * The Census Bureau publishes myriad documentation. Enabling semantic retrieval via RAG should provide agents with information to better respond to user queries.
 
 ### Agent
