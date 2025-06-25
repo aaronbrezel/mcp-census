@@ -1,97 +1,58 @@
 import gradio as gr
 
-from src.mcp_census.functions.census_api_calls import (
-    dec2020_dp,
-    dec2020_dp_fips_lookup,
-)
-from src.mcp_census.functions.census_api_docs import (
-    import_dec2020_datasets_homepage,
-    import_dec2020_dp_geographies,
-    import_dec2020_dp_variables,
-)
-from src.mcp_census.functions.census_utils import (
-    dec2020_dhc_semantic_search,
-    required_geograpy_hierarchy_parents,
+from src.mcp_census.functions.census_api import (
+    fetch_dataset_data,
+    fetch_dataset_examples,
+    fetch_dataset_fips,
+    fetch_dataset_geographies,
+    fetch_dataset_required_parent_geographies,
+    fetch_dataset_variables,
+    fetch_datasets,
+    lookup_dataset_fips,
 )
 
-dec2020_dhc_semantic_search_interface = gr.Interface(
-    fn=dec2020_dhc_semantic_search,
-    inputs=["textbox"],
-    outputs=gr.JSON(),
-    title="U.S. Census Bureau 2020 demographic and housing characteristics documentation",
-    description="Fetches demographic and housing characteristics documentation for the 2020 U.S. Census Bureau decennial census.",
-)
+with gr.Blocks() as mcp_server:
+    gr.Markdown(
+        """
+        # U.S. Census Bureau API Gradio MCP Server
+        This MCP Server allows you to interact with the U.S. Census Bureau API to fetch datasets, geographies, variables, examples, and more.
 
-dec2020_dp_interface = gr.Interface(
-    fn=dec2020_dp,
-    inputs=["textbox", "textbox", "textbox"],
-    outputs=gr.JSON(),
-    title="U.S. Census Bureau 2020 Demographic Profile data",
-    description="Fetches demographic profile data from the 2020 U.S. Census Bureau decennial API.",
-)
+        ## Available Tooling
+        - **Fetch Census Datasets**: Retrieve a list of available Census datasets.
+        - **Fetch Dataset Geographies**: Get information on available geographies for a specific Census dataset.
+        - **Fetch Dataset Variables**: Retrieve information on available variables for a specific Census dataset
+        - **Fetch Dataset Examples**: Get example API calls for a specific Census dataset.
+        - **Fetch Dataset Required Parent Geographies**: Get required parent geographies for a specific geography for a specific Census dataset.
+        - **Fetch Dataset FIPS Codes**: Retrieve FIPS codes for geographies within a specific Census dataset.
+        - **Lookup Dataset FIPS Codes**: Look up FIPS codes by geography name for a specific Census Dataset.
 
-dec2020_dp_fips_lookup_interface = gr.Interface(
-    fn=dec2020_dp_fips_lookup,
-    inputs=["textbox", "textbox", "textbox"],
-    outputs=gr.JSON(),
-    title="FIPS code lookup for the U.S. Census Bureau 2020 decennial census demographic profile dataset",
-    description="Lookup FIPS codes for geography hierarchies provided by the U.S. Census Bureau 2020 decennial census demographic profile dataset",
-)
+        For the full MCP schema, please refer to the [schema endpoint](gradio_api/mcp/schema)
 
-dec2020_dp_geographies_required_interface = gr.Interface(
-    fn=required_geograpy_hierarchy_parents,
-    inputs=["textbox"],
-    outputs=gr.JSON(),
-    title="Geography Hierarchy required parent geographies",
-    description="Utility function that provides required parent geographies when requesting geography hierarchies during U.S. Census Bureau 2020 decennial census demographic profile API calls",
-)
+        ## Use this MCP Server
+        ```json
+        {
+            "mcpServers": {
+                "mcp-census": {
+                    "url": "https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse"
+                }
+            }
+        }
+        ```
 
-dec2020_dp_geographies_interface = gr.Interface(
-    fn=import_dec2020_dp_geographies,
-    inputs=[],
-    outputs=gr.TextArea(),
-    title="U.S. Census Bureau 2020 decennial census demographic profile dataset geographies",
-    description="Information on available geographies for the the U.S. Census Bureau 2020 decennial census demographic profile API.",
-)
-
-dec2020_dp_variables_interface = gr.Interface(
-    fn=import_dec2020_dp_variables,
-    inputs=[],
-    outputs=gr.TextArea(),
-    title="U.S. Census Bureau 2020 decennial census demographic profile dataset variables",
-    description="Information on available variables for the the U.S. Census Bureau 2020 decennial census demographic profile API.",
-)
-
-
-dec2020_datasets_homepage_interface = gr.Interface(
-    fn=import_dec2020_datasets_homepage,
-    inputs=[],
-    outputs=gr.TextArea(),
-    title="U.S. Census Bureau 2020 decennial census datasets",
-    description="Recieve information on available datasets as well as links to helpful documentation",
-)
-
-
-mcp_server = gr.TabbedInterface(
-    [
-        dec2020_datasets_homepage_interface,
-        dec2020_dp_geographies_interface,
-        dec2020_dp_variables_interface,
-        dec2020_dp_geographies_required_interface,
-        dec2020_dp_fips_lookup_interface,
-        dec2020_dp_interface,
-        dec2020_dhc_semantic_search_interface,
-    ],
-    [
-        "2020 U.S. Census Bureau decennial census API Homepage",
-        "2020 U.S. Census Bureau decennial census demographic profile API geographies",
-        "2020 U.S. Census Bureau decennial census demographic profile API variables",
-        "2020 U.S. Census Bureau decennial census demographic profile geography hierarchy required parent geographies",
-        "2020 U.S. Census Bureau decennial census demographic profile geography hierarchy FIPS code lookup",
-        "2020 U.S. Census Bureau decennial census demographic profile API data",
-        "2020 U.S. Census Bureau decennial census demographic and housing characteristics documentation",
-    ],
-)
+        Gradio has more MCP Server documentation available [here](https://www.gradio.app/guides/building-mcp-server-with-gradio).
+        """
+    )
+    gr.api(fetch_dataset_data, api_name="fetch_dataset_data")
+    gr.api(fetch_dataset_examples, api_name="fetch_dataset_examples")
+    gr.api(fetch_dataset_fips, api_name="fetch_dataset_fips")
+    gr.api(fetch_dataset_geographies, api_name="fetch_dataset_geographies")
+    gr.api(
+        fetch_dataset_required_parent_geographies,
+        api_name="fetch_dataset_required_parent_geographies",
+    )
+    gr.api(fetch_dataset_variables, api_name="fetch_dataset_variables")
+    gr.api(fetch_datasets, api_name="fetch_datasets")
+    gr.api(lookup_dataset_fips, api_name="lookup_dataset_fips")
 
 
 if __name__ == "__main__":
