@@ -100,6 +100,7 @@ To update dependencies for the Gradio deployment
 ```zsh
 uv export --group gradio-deployment > requirements.txt
 ```
+**Note: for now you have to remove the `-e .` that the above command generates.**
 
 ## Local Agent Quickstart
 

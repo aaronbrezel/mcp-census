@@ -1,6 +1,6 @@
 import gradio as gr
 
-from mcp_census.functions.census_api import (
+from src.mcp_census.functions.census_api import (
     fetch_dataset_data,
     fetch_dataset_examples,
     fetch_dataset_fips,
