@@ -1,0 +1,54 @@
+[project]
+name = "mcp-census"
+version = "0.1.0"
+description = "MCP wrapper around Census Data"
+license = { text = "Apache-2.0" }
+readme = "README.md"
+requires-python = ">=3.13"
+maintainers = [{ name = "Aaron Brezel", email = "ab4717@columbia.edu" } ]
+keywords = ["census", "mcp", "llm", "automation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "faiss-cpu>=1.11.0",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.24",
+    "langchain-huggingface>=0.2.0",
+    "markdownify>=1.1.0",
+    "mcp[cli]>=1.9.3",
+    "pypdf>=5.6.0",
+    "sentence-transformers>=4.1.0",
+]
+
+[project.scripts]
+mcp-census = "mcp_census:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.urls]
+Homepage = "https://github.com/aaronbrezel/mcp-census"
+Repository = "https://github.com/aaronbrezel/mcp-census"
+Issues = "https://github.com/aaronbrezel/mcp-census/issues"
+
+[dependency-groups]
+agent = [
+    "smolagents[mcp,openai,telemetry]>=1.17.0",
+]
+dev = [
+    "mcp-census",
+    "pre-commit>=4.2.0",
+    "ruff>=0.11.13",
+]
+gradio-deployment = [
+    "gradio[mcp]>=5.34.0",
+]
+
+[tool.uv.sources]
+mcp-census = { workspace = true }
