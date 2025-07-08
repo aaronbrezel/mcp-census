@@ -5,6 +5,7 @@ import httpx
 from dotenv import load_dotenv
 
 from ..vector_dbs.datasets_db import search_census_datasets
+from ..vector_dbs.quick_search import Document, quick_faiss_search
 
 load_dotenv()  # Loads variables from a .env file into os.environ
 API_KEY: str | None = os.getenv("CENSUS_API_KEY", None)
@@ -66,7 +67,9 @@ async def fetch_dataset_geographies(year: str, dataset: str) -> dict:
         return resp.json()
 
 
-async def fetch_dataset_variables(year: str, dataset: str) -> dict:
+async def fetch_dataset_variables(
+    year: str, dataset: str, query: Optional[str] = None
+) -> dict:
     """
     Fetches information on available variables for a specific Census dataset.
 
@@ -75,6 +78,7 @@ async def fetch_dataset_variables(year: str, dataset: str) -> dict:
     Args:
         year (str): The year of the dataset.
         dataset (str): The dataset identifier.
+        query (Optional[str]): A semantic query to filter returned dataset variables
 
     Returns:
         str: Dataset variable information in dict format.
@@ -83,6 +87,22 @@ async def fetch_dataset_variables(year: str, dataset: str) -> dict:
     async with httpx.AsyncClient() as client:
         resp = await client.get(url)
         resp.raise_for_status()
+        if query:
+            response = resp.json()
+            variables: List[Document] = [
+                Document(
+                    page_content=f"Variable: {variable_name}\nDetails: {response['variables'][variable_name]}",
+                    metadata={variable_name: response["variables"][variable_name]},
+                )
+                for variable_name in response["variables"]
+            ]
+            search_results = quick_faiss_search(variables, query)
+            # Reformat back into Census API-style response dict
+            return {
+                "variables": {
+                    k: v for doc in search_results for k, v in doc.metadata.items()
+                }
+            }
         return resp.json()
 
 
