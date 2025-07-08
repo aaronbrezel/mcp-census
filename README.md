@@ -24,7 +24,7 @@ This repo was originally built for the [Gradio/Hugging Face Agents MCP Hackathon
 Right now, we recommend using `mcp-census` in conjunction with an MCP Client running a strong foundation model like Claude Desktop or Cursor.
 
 To connect Claude Desktop to the `mcp-census` server hosted on Hugging Face (_requires Claude Pro tier and above_):
-<img src="assets/remote-mcp-census-installation.png" alt="Remote MCP Census installation" width="200" height="auto">
+<img src="assets/remote-mcp-census-installation.png" alt="Remote MCP Census installation" width="400" height="auto">
 
 To locally run `mcp-census` directly in Claude Desktop, modify your `claude_desktop_config.json`:
 ```json
@@ -123,7 +123,7 @@ The agent will not work without this server running.
 
 ## MCP architecture
 
-<img src="assets/mcp-census.png" alt="MCP Census" width="200" height="auto">
+<img src="assets/mcp-census.png" alt="MCP Census">
 
 ## Roadmap
 
