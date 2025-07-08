@@ -17,4 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://abrezey:$HF_TOKEN@huggingface.co/spaces/abrezey/mcp-census main
+        run: git push https://abrezey:$HF_TOKEN@huggingface.co/spaces/abrezey/mcp-census main
