@@ -26,7 +26,7 @@ with gr.Blocks() as mcp_server:
         - **Fetch Dataset FIPS Codes**: Retrieve FIPS codes for geographies within a specific Census dataset.
         - **Lookup Dataset FIPS Codes**: Look up FIPS codes by geography name for a specific Census Dataset.
 
-        For the full MCP schema, please refer to the [schema endpoint](gradio_api/mcp/schema)
+        For the full MCP schema, please refer to the [schema endpoint](/gradio_api/mcp/schema)
 
         ## Use this MCP Server
         ```json
