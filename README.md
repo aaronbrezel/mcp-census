@@ -126,18 +126,21 @@ The agent will not work without this server running.
 
 <img src="assets/mcp-census.png" alt="MCP Census">
 
-## Roadmap
+## Feature roadmap
 
 ### Evaluation
 
-* In order to systematically improve MCP server and client performance we recommend creating a strong benchmark with which to evaluate changes.
-* MCP server tools can be evaluated via unit tests. Client and agentic behavior can be evaluated on criteria described [here](https://hamel.dev/blog/posts/evals/) and emerging frameworks such as [RAGAS](https://docs.ragas.io/en/stable/).
+* Create a benchmark with which to evaluate MCP server utilization by host application 
+* Improve MCP feature reliability via Unit Testing
 
 ### MCP Server
 
 * The Census Bureau publishes myriad documentation. Enabling semantic retrieval via RAG should provide agents with information to better respond to user queries.
+* Experiment with MCP "[Prompts](https://modelcontextprotocol.io/docs/concepts/prompts)" to better guide LLM question answering
+  * This should include strong citation of process
+* Experiment with MCP "[Ellicitation](https://github.com/modelcontextprotocol/python-sdk?tab=readme-ov-file#elicitation)" to make question answering process more interactive/guided. 
+* 
 
-### Agent
+### MCP Distribution
 
-1. Agentic Behavior can be fine tuned via foundation model choice, prompting as well as introduction of additional tooling such as data exporting. The exact optimizations may depend on intended use case.
-2. Improved citations of census bureau documentation.
+* MCP server installation through [desktop extension](https://www.anthropic.com/engineering/desktop-extensions).
