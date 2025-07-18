@@ -21,21 +21,22 @@ async def fetch_datasets(
     api_base_url: Optional[str] = None,
 ) -> List[str]:
     """
-    Semantic fetch list of available Census datasets based on a query string.
+    Search for relevant Census datasets using semantic search.
 
-    Optionally include filters for year, dataset, and API base URL.
-
-    Leverages a Semantically searchable vector database of Census datasets based on
-    the data available at https://api.census.gov/data.html
+    Use this tool first to discover datasets that match your data needs.
+    The search uses AI to understand your query and find relevant datasets.
 
     Args:
-        query (str): Query string to search datasets.
-        year (str): Optional year filter.
-        dataset (str): Optional dataset identifier filter.
-        api_base_url (str): Optional API base URL filter.
+        query (str): Describe what data you're looking for (e.g., "population by age", "housing costs", "employment statistics")
+        year (str, optional): Filter by specific year (e.g., "2020", "2021")
+        dataset (str, optional): Filter by dataset identifier (e.g., "acs1", "dec/pl")
+        api_base_url (str, optional): Filter by API base URL
 
     Returns:
-        List[str]: A dictionary containing dataset metadata for the specified year.
+        List[str]: List of relevant dataset metadata including titles, descriptions, and identifiers.
+
+    Example:
+        To find population data from 2021: query="population demographics by age and race", year="2021"
     """
 
     return search_census_datasets(
@@ -48,16 +49,21 @@ async def fetch_datasets(
 
 async def fetch_dataset_geographies(year: str, dataset: str) -> dict:
     """
-    Fetches information on available geographies for a specific Census dataset.
+    Get available geographic levels for a dataset (state, county, tract, etc.).
 
-    Wraps the Census API call https://api.census.gov/data/{year}/{dataset}/geography.html
+    Use this after selecting a dataset to understand what geographic breakdowns are available.
+    This helps you determine the appropriate geography for your data request.
 
     Args:
-        year (str): The year of the dataset.
-        dataset (str): The dataset identifier.
+        year (str): Dataset year (e.g., "2021")
+        dataset (str): Dataset identifier from fetch_datasets (e.g., "acs/acs1")
 
     Returns:
-        str: Dataset geography information in dict format.
+        dict: Geographic levels available including required parent geographies.
+
+    Example:
+        For ACS data: year="2021", dataset="acs/acs1"
+        Returns info about state, county, tract, block group availability
     """
     url: str = f"https://api.census.gov/data/{year}/{dataset}/geography.json"
 
@@ -71,17 +77,22 @@ async def fetch_dataset_variables(
     year: str, dataset: str, query: Optional[str] = None
 ) -> dict:
     """
-    Fetches information on available variables for a specific Census dataset.
+    Get available data variables for a dataset with optional semantic filtering.
 
-    Wraps the Census API endpoint https://api.census.gov/data/{year}/{dataset}/variables.html
+    Use this to discover what specific data points are available in your chosen dataset.
+    The query parameter helps narrow down thousands of variables to relevant ones.
 
     Args:
-        year (str): The year of the dataset.
-        dataset (str): The dataset identifier.
-        query (Optional[str]): A semantic query to filter returned dataset variables
+        year (str): Dataset year (e.g., "2021")
+        dataset (str): Dataset identifier from fetch_datasets (e.g., "acs/acs1")
+        query (str, optional): Semantic search to filter variables (e.g., "median income", "poverty rate")
 
     Returns:
-        str: Dataset variable information in dict format.
+        dict: Variable definitions with codes, labels, and concepts.
+
+    Example:
+        To find income variables: year="2021", dataset="acs/acs1", query="household income median"
+        Returns variables like B19013_001E (median household income)
     """
     url: str = f"https://api.census.gov/data/{year}/{dataset}/variables.json"
     async with httpx.AsyncClient() as client:
@@ -108,16 +119,21 @@ async def fetch_dataset_variables(
 
 async def fetch_dataset_examples(year: str, dataset: str) -> dict:
     """
-    Fetches example API calls for a specific Census dataset.
+    Get example API calls for a dataset to understand proper usage patterns.
 
-    Wraps the Census API endpoint https://api.census.gov/data/{year}/{dataset}/examples.html
+    Use this when you're unsure how to structure your data request.
+    Provides real examples of working API calls with proper parameter formats.
 
     Args:
-        year (str): The year of the dataset.
-        dataset (str): The dataset identifier.
+        year (str): Dataset year (e.g., "2021")
+        dataset (str): Dataset identifier (e.g., "acs/acs1")
 
     Returns:
-        dict: Dataset example API calls in dict format.
+        dict: Example API calls with explanations and expected responses.
+
+    Example:
+        For ACS examples: year="2021", dataset="acs/acs1"
+        Returns various example calls showing proper variable and geography usage
     """
     url: str = f"https://api.census.gov/data/{year}/{dataset}/examples.json"
     async with httpx.AsyncClient() as client:
@@ -130,17 +146,22 @@ async def fetch_dataset_required_parent_geographies(
     year: str, dataset: str, geography_name: str
 ) -> list:
     """
-    Fetches required parent geographies for a specific geography within a specific Census dataset
+    Get required parent geographies for a specific geographic level.
 
-    Wraps the Census API endpoint https://api.census.gov/data/{year}/{dataset}/geography.html
+    Use this to understand what parent geographies are needed when requesting
+    data for a specific geographic level (e.g., tracts require county and state).
 
     Args:
-        year (str): The year of the dataset.
-        dataset (str): The dataset identifier.
-        geography_name (str): The name of the geography.
+        year (str): Dataset year (e.g., "2021")
+        dataset (str): Dataset identifier (e.g., "acs/acs1")
+        geography_name (str): Geographic level name (e.g., "tract", "block group")
 
     Returns:
-        list | None: required parent geographies for specific geography.
+        list: Required parent geography levels that must be specified.
+
+    Example:
+        For tract data: geography_name="tract"
+        Returns: ["state", "county"] indicating you need both state and county FIPS
     """
 
     url: str = f"https://api.census.gov/data/{year}/{dataset}/geography.json"
@@ -163,18 +184,25 @@ async def fetch_dataset_fips(
     required_parent_geographies: Dict[str, str] | None = None,
 ) -> dict:
     """
-    Fetches all available FIPS codes for a given geography within a specific Census dataset.
+    Get all available FIPS codes for a geographic level within a dataset.
 
-    Wraps the Census API endpoint https://api.census.gov/data/{year}/{dataset}?get=NAME&for={geography}:*&in={required_parent_geographies}&key={API_KEY}
+    Use this to discover what geographic areas are available at a specific level.
+    Helpful for exploring available counties, tracts, etc.
 
     Args:
-        year (str): The year of the dataset.
-        dataset (str): The dataset identifier.
-        geography (str): The geography of interest.
-        required_parent_geographies (Dict[str, str]): Optional dict of required geographies and their FIPS codes necessary for the request. E.g.: {"state": "05,06", "county": "001"}
-    Returns:
-        dict: A dictionary containing all FIPS codes for the specified geography.
+        year (str): Dataset year (e.g., "2021")
+        dataset (str): Dataset identifier (e.g., "acs/acs1")
+        geography (str): Geographic level (e.g., "county", "tract", "state")
+        required_parent_geographies (Dict[str, str], optional): Parent geography constraints
+            Format: {"parent_type": "fips_codes"}
+            Example: {"state": "06"} to get counties only in California
 
+    Returns:
+        list: All available FIPS codes and names for the specified geography.
+
+    Example:
+        Get all counties in California:
+        geography="county", required_parent_geographies={"state": "06"}
     """
     url: str = f"https://api.census.gov/data/{year}/{dataset}"
     variables = ["NAME"]
@@ -197,29 +225,35 @@ async def lookup_dataset_fips(
     year: str,
     dataset: str,
     geography: str,
-    required_parent_geographies: Dict[str, str] | None = None,
+    parent_geographies: Dict[str, str] | None = None,
 ) -> Dict[str, str]:
     """
-    Fetches the FIPS codes corresponding to a given geography name within a specific Census dataset.
+    Convert a place name to its FIPS code for use in data requests.
 
-    Wraps the Census API endpoint https://api.census.gov/data/{year}/{dataset}?get=NAME&for={geography}:*&in={required_parent_geographies}&key={API_KEY}
-    Then, searches the response for the specified name.
+    Use this when you have a place name (like "Los Angeles County") and need
+    the corresponding FIPS code for data requests.
 
     Args:
-        name (str): The lookup value for the geography, e.g., a specific state or county name.
-        year (str): The year of the dataset.
-        dataset (str): The dataset identifier.
-        geography (str): The geography of interest.
-        required_parent_geographies (Dict[str, str] | None): Optional dict of required parent geographies and their FIPS codes necessary for the request. E.g.: {"state": "05,06", "county": "001"}
-    Returns:
-        Dict[str, str]: A dictionary containing the FIPS codes for the specified lookup.
+        name (str): Exact place name to look up (e.g., "Los Angeles County", "California")
+        year (str): Dataset year (e.g., "2021")
+        dataset (str): Dataset identifier (e.g., "acs/acs1")
+        geography (str): Geographic level to search (e.g., "county", "state")
+        parent_geographies (Dict[str, str], optional): Parent geography constraints
+            Format: {"parent_type": "fips_codes"}
+            Example: {"state": "06"} when looking up counties in California
 
+    Returns:
+        Dict[str, str]: FIPS codes for the named geography.
+
+    Example:
+        Find FIPS for Los Angeles County:
+        name="Los Angeles County, California", geography="county", parent_geographies={"state": "06"}
     """
     resp = await fetch_dataset_fips(
         year=year,
         dataset=dataset,
         geography=geography,
-        required_parent_geographies=required_parent_geographies,
+        required_parent_geographies=parent_geographies,
     )
 
     header, *rows = resp
@@ -236,29 +270,44 @@ async def fetch_dataset_data(
     year: str,
     dataset: str,
     variables: list[str],
-    geographies: Dict[str, str],
-    required_parent_geographies: Dict[str, str] | None = None,
+    target_geographies: Dict[str, str],
+    parent_geographies: Dict[str, str] | None = None,
 ):
     """
-    Fetches data from a specific Census dataset for given variables and geographies.
+    Fetch actual Census data for specific variables and geographic areas.
 
-    Wraps the Census API endpoint https://api.census.gov/data/{year}/{dataset}?get={variables}&for={geography}:*&in={required_parent_geographies}&key={API_KEY}
+    This is the final step - use after identifying variables and geographies from other tools.
+    Returns the actual data values you requested.
 
     Args:
-        year (str): The year of the dataset.
-        dataset (str): The dataset identifier.
-        variables (list[str]): List of variables to fetch.
-        geographies (Dict[str, str]): Dictionary of geographies and their FIPS codes.  E.g.: {"state": "05,06", "county": "001"}
-        required_parent_geographies (Dict[str, str] | None): Optional dict of required parent geographies and their FIPS codes necessary for the request. E.g.: {"state": "05,06", "county": "001"}
+        year (str): Dataset year (e.g., "2021")
+        dataset (str): Dataset identifier (e.g., "acs/acs1")
+        variables (list[str]): Variable codes to fetch (e.g., ["B19013_001E", "NAME"])
+        target_geographies (Dict[str, str]): Geographic areas to get data for
+            Format: {"geography_type": "fips_codes"}
+            Examples:
+            - {"state": "*"} for all states
+            - {"county": "001,002"} for specific counties
+            - {"tract": "*"} for all tracts
+        parent_geographies (Dict[str, str], optional): Required parent geography constraints
+            Format: {"parent_type": "fips_codes"}
+            Examples:
+            - {"state": "06"} when requesting counties in California
+            - {"state": "06", "county": "001"} when requesting tracts in a specific county
+
+    Returns:
+        list: Census API response with data rows and headers.
+
+    Example:
+        Get median income for all counties in California:
+        target_geographies={"county": "*"}, parent_geographies={"state": "06"}
     """
     url: str = f"https://api.census.gov/data/{year}/{dataset}"
 
     params = {"get": variables, "key": API_KEY}
-    params["for"] = [f"{geo}:{fips}" for geo, fips in geographies.items()]
-    if required_parent_geographies:
-        params["in"] = [
-            f"{geo}:{fips}" for geo, fips in required_parent_geographies.items()
-        ]
+    params["for"] = [f"{geo}:{fips}" for geo, fips in target_geographies.items()]
+    if parent_geographies:
+        params["in"] = [f"{geo}:{fips}" for geo, fips in parent_geographies.items()]
 
     async with httpx.AsyncClient() as client:
         resp = await client.get(url, params=params)

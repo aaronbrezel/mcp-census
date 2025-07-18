@@ -1,4 +1,5 @@
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.prompts import base
 from mcp.types import ToolAnnotations
 
 from .functions.census_api import (
@@ -16,39 +17,46 @@ mcp = FastMCP("MCP Census")
 
 # Define MCP Tools, Resources, Prompts and Samplings
 
-################
-# Census API dataset documentation as MCP Resources. Think of resources as "plugins" to the
-# LLM context window that give it a starting knowledge base.
-# Resource uri guide: https://modelcontextprotocol.io/docs/concepts/resources#resource-uris
-# TODO: Unfortunately, this configuration runs afoul of Claude Desktop's context size limit
-#       We'll need to find a way to help the LLM understand what datasets are available without
-#       blowing up the context size. Tooling may be the way to go
-################
-# @mcp.resource("census://data")
-# async def fetch_census_datasets() -> str:
-#     """
-#     Fetch the list of available datasets from the Census Data API
-#     """
-#     url = "https://api.census.gov/data.html"
 
-#     async with httpx.AsyncClient() as client:
-#         resp = await client.get(url)
-#         resp.raise_for_status()
-#         return markdownify(resp.text.strip())
-# @mcp.resource("census://data/{year}/{endpoint}")
-# async def fetch_census_dataset(year: str, endpoint: str) -> str:
-#     """Fetch raw metadata or documentation from the Census Data API."""
-#     url = f"https://api.census.gov/data/{year}/{endpoint}.html"
-#     async with httpx.AsyncClient() as client:
-#         resp = await client.get(url)
-#         resp.raise_for_status()
-#         return markdownify(resp.text.strip())
+@mcp.prompt()
+def census_question_workflow(question: str) -> list[base.Message]:
+    """Guide systematic Census data analysis with step-by-step tool usage."""
+    return [
+        base.UserMessage("A user has asked a question about census data:"),
+        base.UserMessage(question),
+        base.AssistantMessage(
+            "Follow this systematic workflow to answer Census questions:\n\n"
+            "🔍 **Step 1: Understand the Question**\n"
+            "   - Identify what data is needed (population, income, housing, etc.)\n"
+            "   - Determine the geographic scope (state, county, tract, etc.)\n"
+            "   - Note the time period of interest\n\n"
+            "📊 **Step 2: Find Relevant Datasets**\n"
+            "   - Use `fetch_datasets` with a descriptive query\n"
+            "   - Include year filter if specific time period needed\n\n"
+            "🔢 **Step 3: Explore Variables**\n"
+            "   - Use `fetch_dataset_variables` to find specific data points\n"
+            "   - Use semantic query to filter thousands of variables\n\n"
+            "🗺️ **Step 4: Check Geographic Availability**\n"
+            "   - Use `fetch_dataset_geographies` to see available levels\n"
+            "   - Use `fetch_dataset_required_parent_geographies` if needed\n\n"
+            "📍 **Step 5: Handle Geographic Names**\n"
+            "   - Use `lookup_dataset_fips` to convert place names to FIPS codes\n"
+            "   - Use `fetch_dataset_fips` to explore available areas\n\n"
+            "📈 **Step 6: Retrieve Data**\n"
+            "   - Use `fetch_dataset_data` with proper parameters\n"
+            "   - target_geographies: what areas you want data for\n"
+            "   - parent_geographies: required parent constraints\n\n"
+            "💡 **Need Help?** Use `fetch_dataset_examples` for usage patterns"
+        ),
+        base.AssistantMessage("Let's systematically work through your Census question."),
+    ]
 
 
 mcp.add_tool(
     fn=fetch_datasets,
     annotations=ToolAnnotations(
-        title="Fetch Census Datasets by Year",
+        title="🔍 Search Census Datasets",
+        description="Search for relevant Census datasets using semantic search. Start here to find datasets matching your data needs.",
         readOnlyHint=True,
     ),
 )
@@ -56,35 +64,40 @@ mcp.add_tool(
 mcp.add_tool(
     fn=fetch_dataset_geographies,
     annotations=ToolAnnotations(
-        title="Fetch Census Dataset Geographies",
+        title="🗺️ Get Available Geographic Levels",
+        description="Discover what geographic levels (state, county, tract, etc.) are available for a dataset.",
         readOnlyHint=True,
     ),
 )
 mcp.add_tool(
     fn=fetch_dataset_variables,
     annotations=ToolAnnotations(
-        title="Fetch Census Dataset Variables",
+        title="🔢 Explore Dataset Variables",
+        description="Find specific data variables in a dataset. Use semantic query to filter thousands of variables to relevant ones.",
         readOnlyHint=True,
     ),
 )
 mcp.add_tool(
     fn=fetch_dataset_examples,
     annotations=ToolAnnotations(
-        title="Fetch Census Dataset Example API Calls",
+        title="💡 Get Dataset Usage Examples",
+        description="See example API calls for proper usage patterns. Use when unsure how to structure your data request.",
         readOnlyHint=True,
     ),
 )
 mcp.add_tool(
     fn=fetch_dataset_required_parent_geographies,
     annotations=ToolAnnotations(
-        title="Fetch Census Dataset Required Geographies",
+        title="🔗 Check Required Parent Geographies",
+        description="Find what parent geographies are needed for a specific geographic level (e.g., tracts require county and state).",
         readOnlyHint=True,
     ),
 )
 mcp.add_tool(
     fn=fetch_dataset_fips,
     annotations=ToolAnnotations(
-        title="Fetch Census Dataset Geography FIPS Codes",
+        title="📍 Browse Available FIPS Codes",
+        description="Explore all available FIPS codes for a geographic level. Helpful for discovering available counties, tracts, etc.",
         readOnlyHint=True,
     ),
 )
@@ -92,7 +105,8 @@ mcp.add_tool(
 mcp.add_tool(
     fn=lookup_dataset_fips,
     annotations=ToolAnnotations(
-        title="Census Dataset FIPS Codes lookup by name",
+        title="🔍 Convert Place Names to FIPS Codes",
+        description="Convert place names (like 'Los Angeles County') to FIPS codes needed for data requests.",
         readOnlyHint=True,
     ),
 )
@@ -100,7 +114,8 @@ mcp.add_tool(
 mcp.add_tool(
     fn=fetch_dataset_data,
     annotations=ToolAnnotations(
-        title="Fetch Census Dataset Data",
+        title="📈 Retrieve Census Data",
+        description="Get actual Census data values. Use as final step after identifying variables and geographies. Requires proper target_geographies and parent_geographies parameters.",
         readOnlyHint=True,
     ),
 )
