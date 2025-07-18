@@ -36,7 +36,7 @@ async def fetch_datasets(
         List[str]: List of relevant dataset metadata including titles, descriptions, and identifiers.
 
     Example:
-        To find population data: query="population demographics by age and race", year="2021"
+        To find population data from 2021: query="population demographics by age and race", year="2021"
     """
 
     return search_census_datasets(
