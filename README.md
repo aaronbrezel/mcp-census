@@ -15,7 +15,7 @@ short_description: MCP server leveraging U.S. Census Bureau tooling
 
 A work-in-progress MCP server leveraging U.S. Census Bureau tooling for LLM interoperability.
 
-A deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse). Pushes to the `main` branch of this repo will trigger a redeployment of this resource via GitHub Actions.
+Though we recommend installing this server [locally](#local), a deployed census MCP server is available at [https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse](https://abrezey-mcp-census.hf.space/gradio_api/mcp/sse). Pushes to the `main` branch of this repo will trigger a redeployment of this resource via GitHub Actions.
 
 This repo was originally built for the [Gradio/Hugging Face Agents MCP Hackathon](https://huggingface.co/Agents-MCP-Hackathon).
 
@@ -23,10 +23,14 @@ This repo was originally built for the [Gradio/Hugging Face Agents MCP Hackathon
 
 Right now, we recommend using `mcp-census` in conjunction with an MCP Client running a strong foundation model like Claude Desktop or Cursor.
 
+### Remote
+
 To connect Claude Desktop to the `mcp-census` server hosted on Hugging Face (_requires Claude Pro tier and above_):
 <img src="assets/remote-mcp-census-installation.png" alt="Remote MCP Census installation" width="400" height="auto">
 
-To locally run `mcp-census` directly in Claude Desktop, modify your `claude_desktop_config.json`:
+### Local
+
+To locally run `mcp-census` directly in Claude Desktop (you'll need [`uv`](https://docs.astral.sh/uv/#installation)), modify your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
