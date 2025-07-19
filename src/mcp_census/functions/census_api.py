@@ -62,7 +62,7 @@ async def fetch_dataset_geographies(year: str, dataset: str) -> dict:
         dict: Geographic levels available including required parent geographies.
 
     Example:
-        For ACS data: year="2021", dataset="acs/acs1"
+        For 2021 ACS data: year="2021", dataset="acs/acs1"
         Returns info about state, county, tract, block group availability
     """
     url: str = f"https://api.census.gov/data/{year}/{dataset}/geography.json"
